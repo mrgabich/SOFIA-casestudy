@@ -96,7 +96,7 @@ FUNCTION_INSTANCE=
 
 
 # Enables the same number of faults per register
-GENERATE_FAULT_LIST_DISTR=1
+GENERATE_FAULT_LIST_DISTR=0
 
 
 # Mem fault injection paramters
