@@ -9,7 +9,7 @@ ARM_CORTEX_A5, ARM_CORTEX_A7, ARM_CORTEX_A8, ARM_CORTEX_A9,
 ARM_CORTEX_A53, ARM_CORTEX_A57, ARM_CORTEX_A72,
 RISCV32I, RISCV32IM, RISCV32IMAC, RISCV32GC,
 RISCV64IMAC, RISCV64GC'
-ARCHITECTURE=RISCV32I
+ARCHITECTURE=ARM_CORTEX_M7
 
 
 : '
@@ -23,7 +23,7 @@ NUM_CORES=1
 : '
 Number of NUMBER_OF_FAULTS that equals to the number of injected faults
 '
-NUMBER_OF_FAULTS=5
+NUMBER_OF_FAULTS=1
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
@@ -60,7 +60,7 @@ Float v0-v31
 # For RISCV
 Int ra,sp,gp,tp,t0,t1,t2,s0,s1,a0,a1,a2,a3,a4,a5,a6,a7,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,t3,t4,t5,t6,pc
 '
-REG_LIST=r0,r1,r2,r3,r4
+REG_LIST=r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,sp,lr,pc
 
 
 : '
@@ -189,7 +189,7 @@ LICENSE=localhost
 : '
 #IMPERAS VERSION
 '
-IMPERAS_VERSION=20210408
+IMPERAS_VERSION=20230524
 
 
 : '
@@ -200,14 +200,14 @@ export OPTFLAG=3
 
 # Bare Metal
 ## Aarch32 - https://developer.arm.com/downloads/-/gnu-rm
-export ARM_TOOLCHAIN_BAREMETAL=/soft64/cross/gcc/arm-none-eabi_9.3.1
+export ARM_TOOLCHAIN_BAREMETAL=/soft64/cross/gcc/gcc_9.3.1
 export ARM_TOOLCHAIN_BAREMETAL_PREFIX=arm-none-eabi
 ## Aarch64 - https://developer.arm.com/downloads/-/gnu-a
 export AARCH64_TOOLCHAIN_BAREMETAL=/soft64/cross/gcc/aarch64-none-elf_10.3.1
 ## RISCV - https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack
 export RISCV_TOOLCHAIN_BAREMETAL=/soft64/cross/gcc/riscv-none-elf-gcc-12.1.0-2
 export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=riscv-none-elf
-                        
+
 # Linux
 ## Aarch32
 export ARM_TOOLCHAIN_LINUX=/usr
