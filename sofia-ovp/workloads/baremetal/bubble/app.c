@@ -6,6 +6,7 @@ void bubble_sort(long [], long);
 
 int main()
 {
+FIM_Instantiate();
   long array[SIZE], n, c, d, swap;
 
   n = SIZE;
@@ -24,7 +25,7 @@ FIM_exit();
 void bubble_sort(long list[], long n)
 {
   long c, d, t;
-FIM_Instantiate();
+//FIM_Instantiate();
   for (c = 0 ; c < ( n - 1 ); c++)
   {
     for (d = 0 ; d < n - c - 1; d++)
