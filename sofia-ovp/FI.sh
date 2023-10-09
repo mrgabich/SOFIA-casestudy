@@ -705,7 +705,7 @@ function configureCommands {
         if [[ -z "$ENVIRONMENT" ]]; then
                 echo "ENVIRONMENT not set!" && exit
         fi
-        cd - || exit
+        #cd - || exit
 }
 
 
