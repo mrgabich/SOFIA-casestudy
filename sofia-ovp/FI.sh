@@ -753,7 +753,7 @@ do
         # Harness (GOLD)
         export NODES=1;
 
-		if [[ "$(make clean all VERBOSE=1 OPT=$OPTF -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/make.harness")" -ne 0 ]]; then
+		if [[ "$(make clean all VERBOSE=1 OPT=$OPTF CFLAGS+=-fcommon -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/make.harness")" -ne 0 ]]; then
 				cat "$WORKSPACE/make.harness"
 				exit 1
 		fi # Check if make was successfully, if not exits the script
@@ -834,7 +834,7 @@ do
         # Harness (FI)
         export NODES=$FAULTS_PER_PLATFORM;
 
-		make clean all VERBOSE=1 OPT=$OPTF -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/makeh2"
+		make clean all VERBOSE=1 OPT=$OPTF CFLAGS+=-fcommon -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/makeh2"
 		cp -rf "$PLATFORM_FOLDER/harness"/*exe "$WORKING_FOLDER"
 		
         echo "**************************************************************"
