@@ -705,7 +705,6 @@ function configureCommands {
         if [[ -z "$ENVIRONMENT" ]]; then
                 echo "ENVIRONMENT not set!" && exit
         fi
-        #cd - || exit
 }
 
 
@@ -719,6 +718,10 @@ entertime="$(date +%s%N)"
 
 source config
 
+# Create script to init ovp
+python "./initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}"
+source ovp.sh &>/dev/null
+
 # configure the simulator command according with the options
 configureCommands
 
@@ -729,9 +732,6 @@ echo "**************************************************************"
 echo -e "\e[31mCompiling the Platform and Intercept Library \e[0m"
 echo "**************************************************************"
 OPTF=1
-# Create script to init ovp
-python "${PROJECT_FOLDER}/initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}"
-source ovp.sh
 # module
 if [[ "$(make clean all VERBOSE=1 OPT=$OPTF -C "$MODULE_FOLDER" &> "$WORKSPACE/make.module")" -ne 0 ]]; then
 		cat "$WORKSPACE/make.module"
