@@ -634,8 +634,8 @@ function configureCommands {
                                         export OVPFIM_EXEC=$OVP_FIM/OVPFIM-ARMv8.elf # Runtime fim caller
 
                                         # CrossCompiler Linux AARCH64
-                                        export ARM_TOOLCHAIN_LINUX=/usr
-                                        export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
+                                        # export ARM_TOOLCHAIN_LINUX=/usr
+                                        # export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
 
                                         # The arm BL requires a different dtb
                                         export LINUX_DTB=multicluster-57x2_53x4-GICv2.dtb
