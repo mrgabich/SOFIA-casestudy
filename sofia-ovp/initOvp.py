@@ -15,7 +15,15 @@ def main():
         action='store',
         dest='license',
         required=True,
-        help="license origin")
+        help="License origin")
+
+    parser.add_argument(
+        '-p',
+        '--path',
+        action='store',
+        dest='path',
+        required=True,
+        help="Path to Imperas/OVP")
 
     parser.add_argument(
         '-v',
@@ -23,7 +31,7 @@ def main():
         action='store',
         dest='version',
         required=True,
-        help="imperas version")
+        help="Imperas version")
 
     args = parser.parse_args()
 
@@ -31,10 +39,10 @@ def main():
         ovpFile.write("#!/bin/bash\n")
         ovpFile.write("export IMPERASD_LICENSE_FILE=2700@" + args.license + "\n")
         ovpFile.write(
-            "source /soft64/ovp/Imperas." +
+            "source "+ args.path +"Imperas." +
             args.version +
             "/bin/setup.sh\n")
-        ovpFile.write("setupImperas /soft64/ovp/Imperas." + args.version + "\n")
+        ovpFile.write("setupImperas "+ args.path +"Imperas." + args.version + "\n")
         ovpFile.write("eval \"$@\"\n")
 
     subprocess.call(['chmod', '+x', 'ovp.sh'])

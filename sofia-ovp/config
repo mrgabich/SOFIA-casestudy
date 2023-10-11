@@ -215,3 +215,4 @@ export ARM_TOOLCHAIN_LINUX_PREFIX=arm-linux-gnueabi
 ## Aarch64
 export AARCH64_TOOLCHAIN_LINUX=/usr
 export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
+export SIMULATOR_PATH=/home/${USER}/

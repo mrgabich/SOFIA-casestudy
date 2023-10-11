@@ -707,7 +707,12 @@ function configureCommands {
         fi
 }
 
-
+configureOVP(){
+        # Create script to init ovp
+        python3 "./initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}" -p "${SIMULATOR_PATH}"
+        source ovp.sh #&>/dev/null
+        pwd
+}
 
 ################################################################################################
 # entry time stamp
@@ -718,11 +723,8 @@ entertime="$(date +%s%N)"
 
 source config
 
-# Create script to init ovp
-python "./initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}"
-source ovp.sh &>/dev/null
-
 # configure the simulator command according with the options
+configureOVP
 configureCommands
 
 ################################################################################################
@@ -854,8 +856,8 @@ do
         sFaultCampaignBegin="$(date +%s%N)"
         export sFaultCampaignBegin
 
-		# Create script to init ovp
-		python2 "${PROJECT_FOLDER}/initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}"
+		configureOVP
+
 		# Execute the FI platform
 		python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}"
 		# Execute fault harvest
