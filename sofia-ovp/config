@@ -197,22 +197,24 @@ Cross Compiler configuration
 '
 # Compiler optimization flag
 export OPTFLAG=3
-
+#Target Simulator PATH
+export SIMULATOR_PATH=/home/${USER}/
+# Cross Compiler PATH
+export CROSS_COMPILER_PATH=/home/${USER}/cross
 # Bare Metal
 ## Aarch32 - https://developer.arm.com/downloads/-/gnu-rm
-export ARM_TOOLCHAIN_BAREMETAL=/home/${USER}/cross/gcc/aarch32_12.3
+export ARM_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/aarch32_12.3
 export ARM_TOOLCHAIN_BAREMETAL_PREFIX=arm-none-eabi
 ## Aarch64 - https://developer.arm.com/downloads/-/gnu-a
-export AARCH64_TOOLCHAIN_BAREMETAL=/home/${USER}/cross/gcc/aarch64_12.3
+export AARCH64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/aarch64_12.3
 ## RISCV - https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack
-export RISCV_TOOLCHAIN_BAREMETAL=/home/${USER}/cross/gcc/riscv32_12.2
+export RISCV_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32_12.2
 export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
 
 # Linux
 ## Aarch32
-export ARM_TOOLCHAIN_LINUX=/home/${USER}/cross/gcc/aarch32_linux_12.3
+export ARM_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/aarch32_linux_12.3
 export ARM_TOOLCHAIN_LINUX_PREFIX=arm-linux-gnueabi
 ## Aarch64
-export AARCH64_TOOLCHAIN_LINUX=/home/${USER}/cross/gcc/aarch64_linux_12.3
+export AARCH64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/aarch64_linux_12.3
 export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
-export SIMULATOR_PATH=/home/${USER}/
