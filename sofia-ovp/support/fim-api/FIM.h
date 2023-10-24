@@ -29,7 +29,7 @@
                __attribute__ ((naked,optimize("O0"))) void __ovp_exit()     { asm volatile("nop \n bx lr\n");}
                __attribute__ ((naked,optimize("O0"))) void __ovp_segfault() { asm volatile("nop \n bx lr\n");}
     #endif
-#elif riscv //RISCV
+#elif defined (riscv32) || defined(riscv64) //RISCV
     #ifdef __cplusplus
     extern "C" __attribute__ ((naked)) void __ovp_init()     { asm volatile("nop \n jr a0 \n");}
     extern "C" __attribute__ ((naked)) void __ovp_exit()     { asm volatile("nop \n jr a0 \n");}
@@ -64,7 +64,7 @@
     
     #define  FIM_exit()             asm volatile("mov x1, #0 \n mov x0, #0 \n bl __ovp_exit\n");
 
-#elif riscv
+#elif defined (riscv32) || defined(riscv64) //RISCV
     #ifdef BAREMETAL
 //        #define  FIM_Instantiate()  asm volatile("nop \n jal a0, __ovp_exit\n");
         #define  FIM_Instantiate()

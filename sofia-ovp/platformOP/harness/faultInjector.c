@@ -245,7 +245,7 @@ void initProcessorInstFIM(Uns32 processorNumber) {
     PE.applicationEnd   = (Uns64*)         calloc (MACRO_NUMBER_OF_CORES,sizeof(Uns64));
 
     if(MACRO_BAREMETAL_MODE_FLAG) { // !!!! Only valid to one core processor
-        if(!strcmp(options.environment,"ovparmv7") || !strcmp(options.environment,"riscv"))
+        if(!strcmp(options.environment,"ovparmv7") || !strcmp(options.environment,"riscv32") || !strcmp(options.environment,"riscv64"))
             PE.childrens[0]=PE.processorObj;
         else //Using the multicore for baremetal armv8
             PE.childrens[0]=opProcessorChild(PE.processorObj);

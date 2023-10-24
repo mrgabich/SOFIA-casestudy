@@ -207,7 +207,9 @@ class faultGenerator:
 
                 numFlips = self.options.bitFlips
                 # ARMv8 64bit register
-                if self.options.environment==environmentsE.ovparmv8.name or self.options.environment==environmentsE.gem5armv8.name:
+                if self.options.environment==environmentsE.ovparmv8.name \
+                    or self.options.environment==environmentsE.gem5armv8.name \
+                    or self.options.environment==environmentsE.riscv64.name:
                     if self.options.dummy:
                         faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
                     elif targetregisters[faultRegisterIndex][1]=="pc":
@@ -242,7 +244,7 @@ class faultGenerator:
                             faultMask = ctypes.c_uint64 (0xFFFFFFFFFFFFFFFF)    #Random mask of one bit between zero and 31 ones
                         else:
                             faultMask = ctypes.c_uint32(0xFFFFFFFF)                 #No effect
-                    elif targetregisters[faultRegisterIndex][1]=="pc" or self.options.environment==environmentsE.riscv.name:
+                    elif targetregisters[faultRegisterIndex][1]=="pc" or self.options.environment==environmentsE.riscv32.name:
                         if self.options.sequentialBits:
                             maxN = 23 - numFlips
                             shift = randint(0,maxN)

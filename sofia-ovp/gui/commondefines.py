@@ -96,20 +96,22 @@ class compilationOptsE(Enum):
     append = list(range(4))
 
 class environmentsE(Enum):
-    riscv,          \
+    riscv32,        \
     ovparmv7,       \
     ovparmv8,       \
+    riscv64,        \
     ovpmips,        \
     gem5armv7,      \
-    gem5armv8 = list(range(6))
+    gem5armv8 = list(range(7))
 
 class architecturesE(Enum):
-    riscv,          \
+    riscv32,        \
+    riscv64,        \
     cortexA9,       \
     cortexA53,      \
     cortexA57,      \
     cortexA72,      \
-    cortexM4 = list(range(6))
+    cortexM4 = list(range(7))
 
 environmentsL    = [item.name for item in environmentsE]
 workloadsL       = [item.name for item in workloadsE]
