@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from argparse import ArgumentParser
@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import random
+import multiprocessing
 
 ppservers = ()
 serverPath = []
@@ -47,7 +48,7 @@ def getSinglePath():
 
 
 def getHostname():
-    hostname = subprocess.check_output("hostname", shell=True)
+    hostname = subprocess.check_output("hostname", shell=True).decode("UTF-8")
     hostname = hostname.rstrip("\n")
     return hostname
 
@@ -94,7 +95,7 @@ def init():
 def getTimeoutTime():
     f = open("timeOutTime", "r")
     timeOut = int(f.read())
-    return timeOut if timeOut > 0 else 10
+    return int(timeOut) if int(timeOut) > 0 else 10
 
 ###############################################################################
 #                   DEFINE SERVERS & NETWORK COMMUNICATION                    #
@@ -267,6 +268,7 @@ def runHarness(pid, application, execute, path, serverPath):
 def run():
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
+    cpus = multiprocessing.cpu_count()
     for pid in range(1, args.nFaults + 1):
         function = runHarness
         functionArgs = (
@@ -285,9 +287,8 @@ def run():
                 subFunctions,
                 libraries))
         if len(ppservers) == 0:
-            #time.sleep(random.randint(5, 25))
-            # ~ time.sleep(1)
-            time.sleep(.2)
+            # Define sleep for each thread
+            time.sleep(random.randint(1, 2))
     for job in jobs:
         res = job()
 
