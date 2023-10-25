@@ -468,11 +468,13 @@ function configureCommands {
                                 ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
                                 ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
                                 RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 *) echo "Invalid architecture"; exit ;;
                         esac
 

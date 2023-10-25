@@ -10,7 +10,6 @@ import subprocess
 import sys
 import time
 import random
-import multiprocessing
 
 ppservers = ()
 serverPath = []
@@ -268,7 +267,6 @@ def runHarness(pid, application, execute, path, serverPath):
 def run():
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
-    cpus = multiprocessing.cpu_count()
     for pid in range(1, args.nFaults + 1):
         function = runHarness
         functionArgs = (
@@ -288,7 +286,7 @@ def run():
                 libraries))
         if len(ppservers) == 0:
             # Define sleep for each thread
-            time.sleep(random.randint(1, 2))
+            time.sleep(random.uniform(0, 3))
     for job in jobs:
         res = job()
 

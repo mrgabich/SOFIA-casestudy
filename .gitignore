@@ -3,6 +3,7 @@ workspace
 module.op.tcl
 *.pyc
 vmlinux*
+ovp.sh
 linux-aarch32-ael.img
 aarch64-ubuntu-trusty-headless.img
 
