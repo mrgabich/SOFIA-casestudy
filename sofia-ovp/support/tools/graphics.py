@@ -60,6 +60,46 @@ def dacList(faultListDAC):
 
     faultListDAC = [ fault for fault in faultListDAC if fault[6]!=errorAnalysis.Masked_Fault.name  ]
 
+#Copy a list to the DAC classification
+def nnList(faultListNN):
+    for fault in faultListNN:
+        if fault[6]==errorAnalysis.Masked_Fault.name \
+        or fault[6]==errorAnalysis.silent_data_corruption2.name:
+            fault[6]=errorAnalysisML.Correct.name
+            fault[7]=errorAnalysisML.Correct.value
+
+        elif fault[6]==errorAnalysis.Control_Flow_Data_OK.name \
+        or fault[6]==errorAnalysis.REG_STATE_Data_OK.name:
+            fault[6]=errorAnalysisML.Correct.name
+            fault[7]=errorAnalysisML.Correct.value
+
+        elif fault[6]==errorAnalysis.Control_Flow_Data_ERROR.name \
+        or fault[6]==errorAnalysis.REG_STATE_Data_ERROR.name \
+        or fault[6]==errorAnalysis.silent_data_corruption.name:
+            if fault[12]==errorAnalysisNNShort.CORRECT.name \
+            or fault[12]==errorAnalysisNNShort.INPROB1.name:
+                fault[6]=errorAnalysisML.Incorrect_Probability_Soft.name
+                fault[7]=errorAnalysisML.Incorrect_Probability_Soft.value
+            elif fault[12]==errorAnalysisNNShort.INPROB2.name:
+                fault[6]=errorAnalysisML.Incorrect_Probability_Hard.name
+                fault[7]=errorAnalysisML.Incorrect_Probability_Hard.value
+            elif fault[12]==errorAnalysisNNShort.WRONG.name:
+                fault[6]=errorAnalysisML.Wrong_Probability.name
+                fault[7]=errorAnalysisML.Wrong_Probability.value
+            else:
+                fault[6]=errorAnalysisML.No_Prediction.name
+                fault[7]=errorAnalysisML.No_Prediction.value
+
+        elif fault[6]==errorAnalysis.Hang.name:
+            fault[6]=errorAnalysisML.UT_Hang.name
+            fault[7]=errorAnalysisML.UT_Hang.value
+
+        else:
+            fault[6]=errorAnalysisML.UT_Hang.name
+            fault[7]=errorAnalysisML.UT_Hang.value
+
+    faultListNN = [ fault for fault in faultListNN if fault[6]!=errorAnalysis.Masked_Fault.name  ]
+
 def readReport(faultList,fileName):
     simulationTime          = float (subprocess.check_output('grep "Simulation Time (seconds)" %s'%fileName,shell=True,).split()[-1])
     faults                  = int   (subprocess.check_output('grep "Recovered faults" %s'%fileName,shell=True,).split()[-1])
@@ -103,7 +143,7 @@ letterUppercase   = list(string.ascii_uppercase)
 parser.add_option("--FIM_Timing_Trace_file",        action="store", type="string", dest="FIM_Timing_Trace_file", help="File containing the timing stamps from the simulation",   default="./timing.FIM_log")
 parser.add_option("--FIM_Memory_Trace_file",        action="store", type="string", dest="FIM_Memory_Trace_file", help="File containing the memory traces from the simulation",   default="./profile.FIM_log")
 #~ parser.add_option("--FIM_mips_file",                action="store", type="string", dest="FIM_mips_file",         help="Simulation speed (MIPS) for different simulations modes", default="./mips_info.FIM_log") # @Review
-
+parser.add_option("--application",        action="store", type="string", dest="application",       help="Application name",                                                    default="application")
 # replot files
 parser.add_option("--replotfile",                   action="store", type="string", dest="replotfile",       help="input file", default="./application.reportfile")
 
@@ -126,6 +166,7 @@ parser.add_option("--quantum",                      action="store_true", dest="q
 parser.add_option("--executedinstructions",         action="store_true", dest="executedinstructions",       help="Graphic - Number of executed instructions by each fault")
 parser.add_option("--groups",                       action="store_true", dest="groups",                     help="Graphic - Error analysis per group")
 parser.add_option("--groupsdac",                    action="store_true", dest="groupsdac",                  help="Graphic - Error analysis per group using the DAC classification according Cho et al")
+parser.add_option("--groupsnn",                     action="store_true", dest="groupsnn",                   help="Graphic - Error analysis per group using the NN classification")
 parser.add_option("--register",                     action="store_true", dest="register",                   help="Graphic - Inserted fault per register")
 parser.add_option("--memorytrace",                  action="store_true", dest="memorytrace",                help="Graphic - Resource utilisation trace")
 parser.add_option("--mipsbars",                     action="store_true", dest="mipsbars",                   help="Graphic - ...")
@@ -172,6 +213,9 @@ numberOfRegisters = archRegisters.getNumberOfRegisters()
 # colours and hatches
 colors=['dodgerblue', 'lightgrey', 'black', 'darkorange', 'white' , 'yellow' , 'black']
 hatches = ['', '\\', '+', 'x', '*', 'o', 'O', '.']
+#color =['lightgray','grey','black','darkorange','white']
+#colors  = ['silver', 'dimgray', 'black', 'mistyrose', 'indianred', 'darkred']
+#hatches = ['', '', '', '-', '//', '-']
 
 lineStyles  = ['-', '--', '-.', ':','-','--']
 lineColors  = ['red','green','blue','darkorange','black','pink']
@@ -189,7 +233,7 @@ def dumpValues(filelist):
     numberApplicationsPlotted=len(filelist)
 
     #Array of empty lists
-    filesResult= [[] for _ in range(numberApplicationsPlotted)]
+    filesResult= [[] for _ in xrange(numberApplicationsPlotted)]
 
     #Application Names
     applicationNames=[]
@@ -207,7 +251,7 @@ def dumpValues(filelist):
         applicationEnvironments.append(getApplicationEnvironment(filelist[i]))
 
     # array of empty lists
-    data= [[] for _ in range(len(errorAnalysisDAC))]
+    data= [[] for _ in xrange(len(errorAnalysisDAC))]
 
     for i in range(numberApplicationsPlotted):
         for item in filesResult[i]:
@@ -222,7 +266,7 @@ def dumpValues(filelist):
     # Print Each line
     for i in range(len(errorAnalysisDAC)):
         if data[i]:
-            data[i]=list(Counter([int(item[12]) for item in data[i]]).items())
+            data[i]=Counter([int(item[12]) for item in data[i]]).items()
             data[i].sort()
 
             # add missing registers to the list
@@ -332,10 +376,10 @@ if options.comparison:
     mismatch3 = totalMismatch(absDifference(ref4,data4,numfiles),numfiles)
     
     #Info
-    print("Absolute Mismatch for all classes")
-    print("One core Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch1)/16/faults*100) ,(min(mismatch1)/faults*100), (max(mismatch1)/faults*100)))    
-    print("Two cores Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch2)/16/faults*100) ,(min(mismatch2)/faults*100), (max(mismatch2)/faults*100)))    
-    print("Four cores Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch3)/16/faults*100) ,(min(mismatch3)/faults*100), (max(mismatch3)/faults*100)))
+    print ("Absolute Mismatch for all classes")
+    print ("One core Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch1)/16/faults*100) ,(min(mismatch1)/faults*100), (max(mismatch1)/faults*100)))
+    print ("Two cores Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch2)/16/faults*100) ,(min(mismatch2)/faults*100), (max(mismatch2)/faults*100)))
+    print ("Four cores Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch3)/16/faults*100) ,(min(mismatch3)/faults*100), (max(mismatch3)/faults*100)))
     
     # Figure
     f = plt.figure(figsize=(14,8))
@@ -411,7 +455,7 @@ if options.detailedcomp:
     else:
         figureName="worstcasedetailed"
 
-    plt.savefig("{0}/{1}.eps".format(options.outputfolder,figureName))
+    plt.savefig("{0}/{1}.pdf".format(options.outputfolder,figureName))
     sys.exit()
 
 #Quantum difference
@@ -431,15 +475,15 @@ if options.quantum:
     simulationTime,faults,executedInstructions = readReport(faultList,readFolder(options.replotfolder1set.split(',')[0])[0])
   
     # Absolute mismatch
-    print(absDifference(ref,data1,numfiles))
+    print (absDifference(ref,data1,numfiles))
     mismatch1 = totalMismatch(absDifference(ref,data1,numfiles),numfiles)
     mismatch2 = totalMismatch(absDifference(ref,data2,numfiles),numfiles)
     mismatch3 = totalMismatch(absDifference(ref,data3,numfiles),numfiles)
     mismatch4 = totalMismatch(absDifference(ref,data4,numfiles),numfiles)
 
     #Info
-    print("Absolute Mismatch for all classes")
-    print("Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch1)/16/faults*100) ,(min(mismatch1)/faults*100), (max(mismatch1)/faults*100)))
+    print ("Absolute Mismatch for all classes")
+    print ("Average {0:.2f}%, Best Case {1:.2f}%, and Worst Case {2:.2f}%".format( (sum(mismatch1)/16/faults*100) ,(min(mismatch1)/faults*100), (max(mismatch1)/faults*100)))
 
 
     # Figure
@@ -477,7 +521,7 @@ if options.executedinstructions:
     # acquire data
     faultList=[]
     simulationTime,faults,executedInstructions= readReport(faultList,options.replotfile)
-    data = list(Counter([ int(item[9]) for item in faultList]).items())
+    data = Counter([ int(item[9]) for item in faultList]).items()
     data.sort()
 
     y    = [ (float(item[1])/faults)*100 for item in data]
@@ -506,7 +550,7 @@ if options.groups:
     #Acquire data
     faultList=[]
     simulationTime,faults,executedInstructions= readReport(faultList,options.replotfile)
-    data = list(Counter([ item[7] for item in faultList]).items())
+    data = Counter([ item[7] for item in faultList]).items()
     data.sort()
     x  = [int(item[0]) for item in data]
     y  = [(float(item[1])/faults)*100 for item in data]
@@ -522,6 +566,8 @@ if options.groups:
     # Set a different hatch for each bar
         thisbar.set_hatch(hatches[i%len(hatches)])
 
+    for i, v in enumerate(y):
+        plt.text( i, v + 1, str(v), ha='center', va='bottom', fontweight='bold')
 
     plt.ylim([ 0,max(y)*1.10])
     plt.title("Distribution per Grouping")
@@ -540,12 +586,25 @@ if options.groupsdac:
     faultListDAC = copy.deepcopy(faultList)
     dacList(faultListDAC)
 
-    data = list(Counter([ item[7] for item in faultListDAC]).items())
-    data.sort()
+    dataTemp = Counter([ item[7] for item in faultListDAC]).items()
+    data = sorted(dataTemp)
+    temp_list = [(0,0), (1,0), (2,0), (3,0), (4,0)]
+    lst = []
+    for tup1 in temp_list:
+        sum_ = 0
+        for tup2 in data:
+            if tup1[0] == tup2[0]:
+                sum_ = tup1[1]+tup2[1]
+                break
+        lst.append((tup1[0],sum_))
+    data = lst
+
     x  = [int(item[0]) for item in data]
     y  = [(float(item[1])/faults)*100 for item in data]
+    z  = [(float(item[1])) for item in data]
 
     label = [errorAnalysisDAC(int(item[0])).name.replace("_"," ") for item in data]
+    shortlabel = [errorAnalysisDACShort(int(item[0])).name.replace("_"," ") for item in data]
 
     x_pos = np.arange(len(x))
 
@@ -554,16 +613,91 @@ if options.groupsdac:
     #~ for i in range(len(patterns)):
     f = plt.bar(x_pos, y, align='center', alpha=0.5, color=colors)
 
+    tps=options.application+":"
+    pct=options.application+":"
+    val=options.application+":"
+
     for i,thisbar in enumerate(f.patches):
     # Set a different hatch for each bar
         thisbar.set_hatch(hatches[i%len(hatches)])
+    for i, (t,p,v) in enumerate(zip(shortlabel,y,z)):
+        #string to plot percent and fault occurrences
+        txt=str("{:.1f}".format(p))+" - "+str(v)
+        #string to plot fault types
+        tps+=" "+str(t)+","
+        #string to plot fault percent
+        pct+=" "+str("{:.1f}".format(p))+","
+        #string to plot fault occurrences
+        val+=" "+str(v)+","
+        #plot percent and values to graph
+        plt.text( i , p + 1, txt, ha='center', va='bottom', fontweight='bold')
+
+    plt.ylim([ 0,max(y)*1.10])
+    plt.title("Distribution per Grouping")
+    plt.ylabel("Faults (%)")
+    plt.xticks(x_pos, label, rotation=350, horizontalalignment='left')
+    figureName="groupsdac_"+options.application
+
+if options.groupsnn:
+    #Acquire data
+    faultList=[]
+    simulationTime,faults,executedInstructions= readReport(faultList,options.replotfile)
+
+    faultListNN = copy.deepcopy(faultList)
+    nnList(faultListNN)
+
+    dataTemp = Counter([ item[7] for item in faultListNN]).items()
+    data = sorted(dataTemp)
+    temp_list = [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0)]
+    lst = []
+    for tup1 in temp_list:
+        sum_ = 0
+        for tup2 in data:
+            if tup1[0] == tup2[0]:
+                sum_ = tup1[1]+tup2[1]
+                break
+        lst.append((tup1[0],sum_))
+    data = lst
+
+    x  = [int(item[0]) for item in data]
+    y  = [(float(item[1])/faults)*100 for item in data]
+    z  = [(float(item[1])) for item in data]
+
+    label = [errorAnalysisML(int(item[0])).name.replace("_"," ") for item in data]
+    shortlabel = [errorAnalysisML(int(item[0])).name.replace("_"," ") for item in data]
+
+    x_pos = np.arange(len(x))
+
+    plt.figure(figsize=(14,8))
+
+    #~ for i in range(len(patterns)):
+    f = plt.bar(x_pos, y, align='center', alpha=0.5, color=colors)
+
+    tps=options.application+":"
+    pct=options.application+":"
+    val=options.application+":"
+
+    for i,thisbar in enumerate(f.patches):
+    # Set a different hatch for each bar
+        thisbar.set_hatch(hatches[i%len(hatches)])
+    for i, (t,p,v) in enumerate(zip(shortlabel,y,z)):
+        #string to plot percent and fault occurrences
+        txt=str("{:.1f}".format(p))+" - "+str(v)
+        #string to plot fault types
+        tps+=" "+str(t)+","
+        #string to plot fault percent
+        pct+=" "+str("{:.1f}".format(p))+","
+        #string to plot fault occurrences
+        val+=" "+str(v)+","
+        #plot percent and values to graph
+        plt.text( i , p + 1, txt, ha='center', va='bottom', fontweight='bold')
 
     plt.ylim([ 0,max(y)*1.10])
 
     plt.title("Distribution per Grouping")
     plt.ylabel("Faults (%)")
     plt.xticks(x_pos, label, rotation=350, horizontalalignment='left')
-    figureName="groupsdac"
+    figureName="groupsnn_"+options.application
 
 '''
 Plot the number of injected fault per register WITHOUT any grouping
@@ -572,7 +706,7 @@ if options.register:
     # acquire data
     faultList=[]
     simulationTime,faults,executedInstructions= readReport(faultList,options.replotfile)
-    data = list(Counter([ item[2] for item in faultList]).items())
+    data = Counter([ item[2] for item in faultList]).items()
     data.sort()
 
     y  = [int(item[1]) for item in data]
@@ -598,7 +732,7 @@ if options.insertiontime:
     #Acquire data
     faultList=[]
     simulationTime,faults,executedInstructions= readReport(faultList,options.replotfile)
-    data = list(Counter([ int(item[4]) for item in faultList]).items())
+    data = Counter([ int(item[4]) for item in faultList]).items()
     data.sort()
 
     y    = [ int(item[1])for item in data]
@@ -637,7 +771,7 @@ def plotBarStacked(barWidth,faultList,offset=0,label=False,mode=None):
     dacList(faultListDAC)
 
     #Array of empty lists
-    data= [[] for _ in range(len(errorAnalysisDAC))]
+    data= [[] for _ in xrange(len(errorAnalysisDAC))]
 
     #Add the dat
     for item in faultListDAC:
@@ -649,7 +783,7 @@ def plotBarStacked(barWidth,faultList,offset=0,label=False,mode=None):
     yOffset = np.zeros(numberOfRegisters)
 
     for i in range(len(errorAnalysisDAC)):
-        data[i] = list(Counter([ int(item[3]) for item in data[i]]).items())
+        data[i] = Counter([ int(item[3]) for item in data[i]]).items()
         data[i].sort()
 
         #Add missing registers
@@ -774,7 +908,7 @@ def plotBarStackedApplication(barWidth,filelist,offset=0,label=False,mode=None,a
     numberApplicationsPlotted=len(filelist)
 
     #Array of empty lists
-    filesResult= [[] for _ in range(numberApplicationsPlotted)]
+    filesResult= [[] for _ in xrange(numberApplicationsPlotted)]
 
     #Application Names
     applicationNames=[]
@@ -796,7 +930,7 @@ def plotBarStackedApplication(barWidth,filelist,offset=0,label=False,mode=None,a
         applicationNames = appnames
 
     # array of empty lists
-    data= [[] for _ in range(len(errorAnalysisDAC))]
+    data= [[] for _ in xrange(len(errorAnalysisDAC))]
 
     # Collect the results into the data list
     for i in range(numberApplicationsPlotted):
@@ -813,7 +947,7 @@ def plotBarStackedApplication(barWidth,filelist,offset=0,label=False,mode=None,a
     for i in range(len(errorAnalysisDAC)):
         # Include missing class to force the label out
         if data[i]:
-            data[i]=list(Counter([int(item[12]) for item in data[i]]).items())
+            data[i]=Counter([int(item[12]) for item in data[i]]).items()
             data[i].sort()
 
             # add missing items to the list
@@ -936,7 +1070,7 @@ def plotBarCompared(barWidth,faultList,ax,offset=0,label=None,mode=None):
     yOffset = np.zeros(xlength)
 
     # get the number of occurrences for each class
-    y = list(Counter([ item[7] for item in faultListDAC]).items())
+    y = Counter([ item[7] for item in faultListDAC]).items()
 
     for i in range(xlength):
         if y[i][0]!=i:
@@ -991,7 +1125,7 @@ if options.barCompared2sets:
     y2 = [(abs(float(storedYaxis[1][i])/float(storedYaxis[0][i]) -1)) *100 for i in range(xlength)]
 
     # top plot
-    ax1.plot(list(range(xlength)), y2,linestyle='--',label="OVPvsAtomic")
+    ax1.plot(range(xlength), y2,linestyle='--',label="OVPvsAtomic")
 
     # top figure
     applicationName=getApplicationName(files[1])
@@ -1192,7 +1326,7 @@ if options.speeds:
             mipsList.append(line.split())
 
         numberOfCores=len(mipsList[0])-1
-        rangeToPlot=list(range(1,numberOfCores+1))
+        rangeToPlot=range(1,numberOfCores+1)
 
         #plot data
         for i in range(len(mipsList)):
@@ -1238,7 +1372,7 @@ if options.scalability:
         mipsList.append(line.split())
 
     numberOfCores=len(mipsList[0])-1
-    rangeToPlot=list(range(1,numberOfCores+1))
+    rangeToPlot=range(1,numberOfCores+1)
 
     #plot data
     for i in range(len(mipsList)):
@@ -1265,5 +1399,18 @@ if options.scalability:
 if options.outputfile:
     figureName=options.outputfile
 
-plt.savefig("{0}/{1}.png".format(options.outputfolder,figureName),bbox_inches='tight',dpi=300)
-plt.savefig("{0}/{1}.pdf".format(options.outputfolder,figureName),bbox_inches='tight',dpi=300)
+f=open("./simulation.log","a+")
+f.write(tps+"\n")
+f.write(val+"\n")
+f.write(pct+"\n")
+f.close()
+f=open("../simulation_percent.log","a+")
+f.write(tps+"\n")
+f.write(pct+"\n")
+f.close()
+f=open("../simulation_values.log","a+")
+f.write(tps+"\n")
+f.write(val+"\n")
+f.close()
+plt.savefig("{0}/{1}.png".format(options.outputfolder,figureName),bbox_inches='tight')
+plt.savefig("{0}/{1}.pdf".format(options.outputfolder,figureName),bbox_inches='tight')
