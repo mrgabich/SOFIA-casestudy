@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/home/geancarloabich/.localpython/bin/python2
 # Parallel Python Software: http://www.parallelpython.com
 # Copyright (c) 2005-2017, Vitalii Vanovschi
 # All rights reserved.
