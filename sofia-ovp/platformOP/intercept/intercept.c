@@ -326,9 +326,19 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
     /// read the memory that triggered the CB
     Uns32 checker = vmirtRead4ByteDomain(dataDomain, thisPC, endian, MEM_AA_FALSE);
 
-    /// checking for the correct symbols (0xe320f000 -> NOP operation or 0X4770bf00 ARMv7-M NOP or 0X477046c0 ARMv6-M NOP or 0Xd503201f AARCH64-a NOP )
-    if(checker!=0xe320f000 && checker!=0X4770bf00 && checker!=0X477046c0 && checker!=0Xd503201f)
+    /// checking for the correct symbols:
+    ///     0xe320f000 -> NOP operation or
+    ///     0X4770bf00 ARMv7-M NOP or
+    ///     0X477046c0 ARMv6-M NOP or
+    ///     0Xd503201f AARCH64-a NOP or
+    ///     0x85020001 RISC-V NOP
+    if( checker!=0xe320f000 && 
+        checker!=0X4770bf00 && 
+        checker!=0X477046c0 && 
+        checker!=0Xd503201f && 
+        checker!=0x85020001) {
         return;
+    }
 
     /// update the return code
     MACRO_UPDATE_STOP_REASON(service)

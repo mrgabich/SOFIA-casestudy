@@ -66,11 +66,11 @@
 
 #elif defined (riscv32) || defined(riscv64) //RISCV
     #ifdef BAREMETAL
-//        #define  FIM_Instantiate()  asm volatile("nop \n jal a0, __ovp_exit\n");
+        #define  FIM_Instantiate() asm volatile("nop \n jal a0, __ovp_init\n");
+    #else
         #define  FIM_Instantiate()
     #endif
-
-        #define  FIM_exit()             asm volatile("nop \n jal a0, __ovp_exit\n");
+        #define  FIM_exit()        asm volatile("nop \n jal a0, __ovp_exit\n");
 
 #endif
 

@@ -171,7 +171,7 @@ numberOfRegisters = archRegisters.getNumberOfRegisters()
 ####################################################################################################
 # colours and hatches
 colors=['dodgerblue', 'lightgrey', 'black', 'darkorange', 'white' , 'yellow' , 'black']
-hatches = [' ', '\\', '+', 'x', '*', 'o', 'O', '.']
+hatches = ['', '\\', '+', 'x', '*', 'o', 'O', '.']
 
 lineStyles  = ['-', '--', '-.', ':','-','--']
 lineColors  = ['red','green','blue','darkorange','black','pink']
@@ -1265,4 +1265,5 @@ if options.scalability:
 if options.outputfile:
     figureName=options.outputfile
 
-plt.savefig("{0}/{1}.eps".format(options.outputfolder,figureName),bbox_inches='tight')
+plt.savefig("{0}/{1}.png".format(options.outputfolder,figureName),bbox_inches='tight',dpi=300)
+plt.savefig("{0}/{1}.pdf".format(options.outputfolder,figureName),bbox_inches='tight',dpi=300)
