@@ -24,3 +24,11 @@ cd /home/${USER}/virtualenv-1.9
 #source ~/virtualenv-1.9/virtualenv_py2/bin/activate
 cd -
 echo "export PATH=/home/${USER}/.localpython/bin:${PATH}" >> ~/.bashrc
+source ~/.bashrc
+#pip2 install --user pp
+#wget https://www.parallelpython.com/downloads/pp/pp-1.6.6.tar.gz
+#tar -xvf pp-1.6.6.tar.gz
+#rm pp-1.6.6.tar.gz
+cd pp-1.6.6
+python2 setup.py install
+cd ..

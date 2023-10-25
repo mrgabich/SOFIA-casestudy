@@ -2,12 +2,14 @@
 
 : '
 """ Fault Injection Module to OVP
-    Version 1.0
-    02/02/2016
-
-    Author: Felipe Rocha da Rosa - frdarosa.com
+    Version 1.0    02/02/2016
+    Version 1.1    30/10/2023
+    Authors: Felipe Rocha da Rosa - frdarosa.com
+             Geancarlo Abich - abich@ieee.org
 """
 '
+
+./config_py2.sh
 
 #Dependencies
 sudo apt-get --force-yes -y install git
@@ -46,7 +48,6 @@ sudo apt-get --force-yes -y install python-scipy
 sudo apt-get --force-yes -y install python-numpy
 sudo apt-get --force-yes -y install python-pip
 sudo apt-get --force-yes -y install python-tk
-pip install matplotlib==1.5.3
-pip install --upgrade pip
+pip3 install matplotlib
+pip3 install --upgrade pip
 sudo apt-get install python3-pip
-pip2 install --user pp
