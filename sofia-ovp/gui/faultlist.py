@@ -85,6 +85,7 @@ class faultGenerator:
             # replace the old list
             targetregisters = copy.deepcopy(targetregistersRestrited)
             numregisters = len(targetregisters)
+            print(targetregisters)
 
             if self.options.eqdist: # generate the same number of faults for each registers in the list
                 if (self.options.numfaults % numregisters) == 0 :
@@ -137,10 +138,11 @@ class faultGenerator:
         fileptr = open(self.faultlist,'w')
 
         # File header
-        fileptr.write("%8s %7s %10s %2s %18s %7s\n" %("Index","Type","Target","i","Insertion Time","Mask"))
+        fileptr.write("%8s %7s %10s %2s %18s %67s\n" %("Index","Type","Target","i","Insertion Time","Mask"))
 
         # Counter of created faults per core
         targetcores = [0]*(numcores)
+        vecOffset = 0
 
         # Number of faults
         for i in range(1,self.options.numfaults+1):
@@ -206,15 +208,51 @@ class faultGenerator:
                 numfaultsbyreg[int(targetregisters[faultRegisterIndex][0])]+=1
 
                 numFlips = self.options.bitFlips
-                # ARMv8 64bit register
+                # ARMv8 and RISC-V 64bit register
                 if self.options.environment==environmentsE.ovparmv8.name \
                     or self.options.environment==environmentsE.gem5armv8.name \
                     or self.options.environment==environmentsE.riscv64.name:
                     if self.options.dummy:
                         faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
+                    elif self.options.environment==environmentsE.riscv64.name:
+                        if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                            bit_array = np.ones(self.options.vecbw, dtype=np.uint8)
+                            if self.options.sequentialBits:
+                                maxN = (self.options.vecbw-1) - numFlips
+                                shift = randint(0,maxN)
+                                # vecOffset = targetBit % 64
+                                #mask64 = targetBit / 64
+                                # shift = targetBit / 64
+                                for x in range(shift, shift+numFlips): 
+                                    shiftValues.append(x)
+                            else:
+                                shiftValues = sample(range(0,(self.options.vecbw-1)), numFlips)
+                            for j in shiftValues:
+                                bit_array[j] ^= 1
+                            # Convert the bit array to bytes
+                            byte_array = np.packbits(bit_array)
+
+                            # Convert bytes to a hex string
+                            faultMask = byte_array.tobytes().hex()
+
+                            # Print the result
+                            print(faultMask)
+                        else:
+                            if self.options.sequentialBits:
+                                maxN = (archregisters.busWidth-1) - numFlips
+                                shift = randint(0,maxN)
+                                for x in range(shift, shift+numFlips): 
+                                    shiftValues.append(x)
+                            else:
+                                shiftValues = sample(range(0,63), numFlips)
+                            for j in shiftValues:
+                                masks.append(ctypes.c_uint64(~(0x1 << j)))
+                            faultMask = masks[0]
+                            for j in range (1, numFlips):
+                                faultMask = ctypes.c_uint64(faultMask.value & masks[j].value)
                     elif targetregisters[faultRegisterIndex][1]=="pc":
                         if self.options.sequentialBits:
-                            maxN = 57 - numFlips
+                            maxN = (archregisters.busWidth-7) - numFlips
                             shift = randint(0,maxN)
                             for x in range(shift, shift+numFlips): 
                                 shiftValues.append(x)
@@ -227,7 +265,7 @@ class faultGenerator:
                             faultMask = ctypes.c_uint64(faultMask.value & masks[j].value)
                     else:
                         if self.options.sequentialBits:
-                            maxN = 63 - numFlips
+                            maxN = (archregisters.busWidth-1) - numFlips
                             shift = randint(0,maxN)
                             for x in range(shift, shift+numFlips): 
                                 shiftValues.append(x)
@@ -241,7 +279,7 @@ class faultGenerator:
                 else:
                     if self.options.dummy:
                         if targetregisters[faultRegisterIndex][1] in archregisters.floatRegisters:
-                            faultMask = ctypes.c_uint64 (0xFFFFFFFFFFFFFFFF)    #Random mask of one bit between zero and 31 ones
+                            faultMask = ctypes.c_uint64 (0xFFFFFFFFFFFFFFFF)        #No effect float
                         else:
                             faultMask = ctypes.c_uint32(0xFFFFFFFF)                 #No effect
                     elif targetregisters[faultRegisterIndex][1]=="pc" or self.options.environment==environmentsE.riscv32.name:
@@ -343,8 +381,10 @@ class faultGenerator:
                     faultMask = ctypes.c_uint8(0xFF)                     # no effect
                 else:
                     faultMask = ctypes.c_uint8(~(0x1<< randint(0,7)))    # random mask of one bit between zero and 31 ones
-
-            fileptr.write("%7d %10s %16s %4s %15d:%d %12X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
+            if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask))
+            else:
+                fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
         fileptr.close()
 
         return self.faultlist
