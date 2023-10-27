@@ -36,6 +36,7 @@ Bool removeDumpFiles = True;
 Bool enableContexTrace      = False;
 
 // Temporary string
+#define MAX_VECTOR_REG_WIDTH 512
 #define STRING_SIZE 256
 #define TMP_STRING_SIZE 1024
 
@@ -1047,7 +1048,12 @@ void handlerFaultInjection(Uns32 processorNumber) {
     Uns64 memAddress;
     Uns8  memValue;
     Uns64 regTemp=0x0;
-
+    Uns64 vecRegTemp[(MAX_VECTOR_REG_WIDTH/64)];
+    Uns64 tvecRegTemp[(MAX_VECTOR_REG_WIDTH/64)];
+    for (int i=0; i<(MAX_VECTOR_REG_WIDTH/64);i++){
+        vecRegTemp[i]=0xFFFFFFFFFFFFFFFF;
+        tvecRegTemp[i]=0xAAAAAAAAAAAAAAAA+i+1;
+    }
     switch(PE.status) {
     case BEFORE_INJECTION: { /// inject the fault
         /// next State
@@ -1083,14 +1089,29 @@ void handlerFaultInjection(Uns32 processorNumber) {
 
         /// insert the fault
         if(MACRO_FAULTTYPE(TYPE_REGISTER) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE2)) { //Register faults
-            // Acquire the register
-            opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,&regTemp);
-            //~ opPrintf("Reg %s Value "FMT_64x" before "FMT_64x"",PE.faultRegister,PE.faultValue,regTemp);
-            // Apply the mask
-            regTemp= ~(regTemp ^ PE.faultValue);
-            // Writeback register
-            opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,&regTemp);
-            //~ opPrintf(" after "FMT_64x" \n",regTemp);
+            if (!strcmp(PE.faultRegister, "v0")){
+                // Acquire the register
+                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,tvecRegTemp);
+                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
+                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x" "FMT_64x" "FMT_64x" "FMT_64x" \n",PE.faultRegister,PE.faultValue, vecRegTemp[0],vecRegTemp[1],vecRegTemp[2],vecRegTemp[3]);
+                opPrintf("Reg %s Value "FMT_64x" before %s\n",PE.faultRegister,PE.faultValue,(char*) vecRegTemp);
+                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,&regTemp);
+                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x"\n",PE.faultRegister,PE.faultValue,regTemp);
+                // Apply the mask
+                //vecRegTemp= ~(vecRegTemp[0] ^ PE.faultValue);
+                // Writeback register
+                // opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,&vecRegTemp);
+                //~ opPrintf(" after "FMT_64x" \n",regTemp);
+            }else{
+                // Acquire the register
+                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,&regTemp);
+                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x"\n",PE.faultRegister,PE.faultValue,regTemp);
+                // Apply the mask
+                regTemp= ~(regTemp ^ PE.faultValue);
+                // Writeback register
+                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,&regTemp);
+                //~ opPrintf(" after "FMT_64x" \n",regTemp);
+            }
 
         }else if ( MACRO_FAULTTYPE(TYPE_MEMORY2) || MACRO_FAULTTYPE(TYPE_VARIABLE2) || MACRO_FAULTTYPE(TYPE_FUNCTIONCODE) ){ // Virtual Memory faults
             // Acquire the address
