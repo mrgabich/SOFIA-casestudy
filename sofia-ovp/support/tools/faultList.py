@@ -44,6 +44,7 @@ parser.add_option("--eqdist",    action="store_true", dest="eqdist",    help="Th
 # memory fault options
 parser.add_option("--memaddress",action="store", type="long", dest="memaddress", help="Default base memory address",default=0x0)
 parser.add_option("--memsize",   action="store", type="long", dest="memsize",    help="Default base memory size (in hex)",default=0x8000000)
+parser.add_option("--vectorbw",   action="store", type="long", dest="vecbw",    help="Default vector register size",default=128)
 
 # parse the options
 (options, args) = parser.parse_args()
@@ -146,6 +147,7 @@ fileptr.write("%8s %7s %10s %2s %18s %7s\n" %("Index","Type","Target","i","Inser
 
 #Counter of created faults per core
 possibleTargetCores = [0]*(numberOfCores)
+vecOffset = 0
 
 for i in range(1,options.numberoffaults+1):
     # fault injection time
@@ -181,9 +183,19 @@ for i in range(1,options.numberoffaults+1):
         faultRegisterIndex = randint(0,len(possibleRegisters)-1)
         numberOfFaultsPerReg[int(possibleRegisters[faultRegisterIndex][0])]+=1
 
-        if options.environment==archtecturesE.ovparmv8.name or options.environment==archtecturesE.gem5armv8.name:
+        if options.environment==archtecturesE.ovparmv8.name \
+            or options.environment==archtecturesE.gem5armv8.name\
+            or options.environment==archtecturesE.riscv64.name:
             if options.nobitflip:
                 faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
+            elif options.environment==archtecturesE.riscv64.name:
+                if possibleRegisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                    targetBit = randint(0,int(options.vecbw))
+                    vecOffset = targetBit % 64
+                    mask64 = targetBit / 64
+                    faultMask = ctypes.c_uint64 (~(0x1<< mask64))   #Random mask of one bit between zero and 63 ones with Offset
+                else:
+                    faultMask = ctypes.c_uint64 (~(0x1<< randint(0,63)))    #Random mask of one bit between zero and 63 ones
             elif possibleRegisters[faultRegisterIndex][1]=="pc":
                 faultMask = ctypes.c_uint64 (~(0x10<< randint(0,57)))   #Random mask of one bit between 4 and 31 ones
             else:
@@ -191,6 +203,11 @@ for i in range(1,options.numberoffaults+1):
         else:
             if options.nobitflip:
                 faultMask = ctypes.c_uint32(0xFFFFFFFF)                 #No effect
+            elif options.environment==archtecturesE.riscv32.name:
+                if possibleRegisters[faultRegisterIndex][1] in archregisters.floatRegisters:
+                    faultMask = ctypes.c_uint64 (~(0x1<< randint(0,61)))    #Random mask of one bit between zero and 63 ones
+                else:
+                    faultMask = ctypes.c_uint32 (~(0x1<< randint(0,31)))    #Random mask of one bit between zero and 31 ones
             elif possibleRegisters[faultRegisterIndex][1]=="pc":
                 faultMask = ctypes.c_uint32 (~(0x10<< randint(0,23)))   #Random mask of one bit between 4 and 31 ones
             else:

@@ -36,6 +36,12 @@ parser.add_option("--cputype",            action="store", type="string", dest="c
 parser.add_option("--faultlist",          action="store", type="string", dest="faultlist",         help="File containing the fault list [default: %default]",                  default="./faultlist")
 parser.add_option("--goldinformation",    action="store", type="string", dest="goldinformation",   help="File containing the golden information [default: %default]",          default="./goldinformation")
 parser.add_option("--folder",             action="store", type="string", dest="folder",            help="Folder that contains the reports to be harvested",                    default="./Reports/")
+parser.add_option("--dumpfolder",         action="store", type="string", dest="dumpfolder",        help="Folder that contains the dump reports to be harvested",               default="./Dumps/")
+parser.add_option("--tracefolder",        action="store", type="string", dest="tracefolder",       help="Folder that contains the trace reports to be harvested",              default="./Traces/")
+parser.add_option("--appdump",            action="store", type="string", dest="appdump",           help="File containing the app object dump",                                 default="./app.lst")
+parser.add_option("--outputdata",         action="store", type="string", dest="outputdata",        help="Output data from an application")
+parser.add_option("--outputdatasize",     action="store", type="int",    dest="outputdatasize",    help="Size of output data type in bits")
+parser.add_option("--outputdataoffset",   action="store", type="int",    dest="outputdataoffset",  help="Address offset of output data type")
 
 # architecture
 parser.add_option("--environment",         type="choice", dest="environment", choices=architectures, help="Choose one architecture mode", default=architectures[0])
@@ -60,8 +66,7 @@ faultList=[]
 # expected number of faults
 numberTotalOfFaults = options.numberoffaults * options.parallelexecutions
 
-instructionCount = subprocess.check_output('grep "Application # of instructions" {0} | cut -d \'=\' -f2'.format(options.goldinformation),shell=True,).rstrip()
-instructionCount = instructionCount.decode("utf-8")
+instructionCount = int(subprocess.check_output('grep "Application # of instructions" {0} | cut -d \'=\' -f2'.format(options.goldinformation),shell=True,).rstrip())
 
 numberApplicationsPlotted = 0
 
@@ -81,7 +86,7 @@ faultList.sort(key=lambda x: int(x[0]))
 
 # see if all fault reports are accessible
 if(numberApplicationsPlotted != options.parallelexecutions):
-    print("error - missing files " + str(numberTotalOfFaults-numberApplicationsPlotted))
+    print ("error - missing files " + str(numberTotalOfFaults-numberApplicationsPlotted))
 
 # the files missing are considered as hangs in the ovp and unexpected termination in the gem5
 if (numberApplicationsPlotted != options.parallelexecutions):
@@ -93,12 +98,12 @@ if (numberApplicationsPlotted != options.parallelexecutions):
             a+=(1 if a<(len(faultList)-1) else 0)
         else: # include missing faults
             if options.environment==archtecturesE.gem5armv7.name or options.environment==archtecturesE.gem5armv8.name:
-                temp =str(linecache.getline(options.faultlist,i+1).rstrip()+" "+errorAnalysis.RD_PRIV.name+" "+str(errorAnalysis.RD_PRIV.value)+" 0 "+instructionCount+" Null 0")
+                temp =str(linecache.getline(options.faultlist,i+1).rstrip()+" "+str(errorAnalysis.RD_PRIV.name)+" "+str(errorAnalysis.RD_PRIV.value)+" 0 "+str(instructionCount)+" Null 0")
                 faultList.append(temp.split())
                 numberApplicationsPlotted+=1
                 faultList[-1][4] = faultList[-1][4].split(":")[0]
             else:
-                temp =str(linecache.getline(options.faultlist,i+1).rstrip()+" "+errorAnalysis.Hang.name+" "+str(errorAnalysis.Hang.value)+" 0 "+instructionCount+" Null 0")
+                temp =str(linecache.getline(options.faultlist,i+1).rstrip()+" "+str(errorAnalysis.Hang.name)+" "+str(errorAnalysis.Hang.value)+" 0 "+str(instructionCount)+" Null 0 ERROR")
                 faultList.append(temp.split())
                 numberApplicationsPlotted+=1
                 faultList[-1][4] = faultList[-1][4].split(":")[0]
@@ -111,19 +116,110 @@ mipsExecutedInstructions =float(totalExecutedInstructions)/(options.executiontim
 totalExecutedInstructionsWithChkp=0
 for fault in faultList:
     if(fault[9]=="0"):
-        print(fault)
+        print (fault)
     totalExecutedInstructionsWithChkp += int(fault[11]) + int(fault[9])
 
 mipsExecutedInstructionsWithChkp =float(totalExecutedInstructionsWithChkp)/(options.executiontime /1000)
 
+# --------------------------------------- Verify the Output Data ------------------------------------ #
+if options.outputdata:
+    #Auxiliar structures
+    gold_appdata=[]
+    fault_appdata=[]
+    output_start = 0
+
+    #Find the Address in the Gold Trace Dump
+    found=0
+    goldPatternIndex=0
+    #insert here the output data offset
+    Lines=open(options.tracefolder+"GOLD_TRACE-0").readlines()
+    for line in Lines:
+        gold_appdata.append(line.split()[0])
+    #Remove empty places
+    while("" in gold_appdata):
+        gold_appdata.remove("")
+    goldresultlist = []
+    data_size_offset = int(options.outputdatasize/4)
+    for x in range(0, len(gold_appdata), 1):
+        for index in range(0, len(gold_appdata[x]), data_size_offset):
+            goldresultlist.append(int(gold_appdata[x][index : index + data_size_offset],16))
+    #stores 80% of top ranked prediction
+    top_pred = int(0.8*max(goldresultlist))
+    #stores 20% of top ranked prediction
+    diff_pred = int(0.2*max(goldresultlist))
+
+    #Compares Output from Gold with Fault Variable Trace
+    for i in range(0,len(faultList)):
+        fault_appdata.clear()
+        found=0
+        dpfile=str(options.tracefolder+"FAULT_TRACE-"+faultList[i][0])
+        if os.path.isfile(dpfile) and os.stat(dpfile).st_size > 0:
+            Lines=open(dpfile).readlines()
+            for line in Lines:
+                fault_appdata.append(line.split()[0])
+            #Remove empty places
+            while("" in fault_appdata):
+                fault_appdata.remove("")
+            #If the exit is identical it assumes that it is correct
+            if not (set(gold_appdata)-set(fault_appdata)):
+                faultList[i][12] = "CORRECT"
+            else:
+                #types
+                #wrong detection - false positive or missing
+                #incorrect probability1 - pattern recognized with at least one different percentile
+                #incorrect probability2 - pattern NOT recognized and different percentile
+                #no prediction - no objects
+
+                if len(gold_appdata) != len(fault_appdata):
+                    faultList[i][12] = "NOPRED"
+                else:
+                    if not int(fault_appdata[0],16):
+                        faultList[i][12] = "NOPRED"
+                    else:
+                        probability_diff_list = []
+                        found=0
+                        pattern_recognized=0
+                        for x in range(0, len(gold_appdata), 1):
+                            if (len(gold_appdata[x]) != len(fault_appdata[x])):
+                                break
+                            else:
+                                for index in range(0, len(gold_appdata[x]), data_size_offset):
+                                    probability_diff_list.append( abs(int(gold_appdata[x][index : index + data_size_offset],16) - int(fault_appdata[x][index : index + data_size_offset],16)))
+                                    if int(gold_appdata[x][index : index + data_size_offset],16) > top_pred:
+                                        #verify if pattern recognition are the same at gold and fault exec
+                                        if int(gold_appdata[x][index : index + data_size_offset],16) == int(fault_appdata[x][index : index + data_size_offset],16):
+                                            pattern_recognized=1
+                                    #verify if there is any pattern recognition at fault exec
+                                    if int(fault_appdata[x][index : index + data_size_offset],16) > top_pred:
+                                        found=1
+                        if (found == 0):
+                            faultList[i][12] = "NOPRED"
+                        else:
+                            #pattern recognized at fault exec but with differences
+                            #MUST Be same as the benchmark pattern definition to probability distribution
+                            if (pattern_recognized == 1):
+                                faultList[i][12] = "INPROB1"
+                            else:
+                                found=0
+                                #verify the difference between gold and fault probabilities
+                                for index in range(0, len(probability_diff_list), 1):
+                                    if(probability_diff_list[index] > diff_pred):
+                                        found=1
+                                if found:
+                                    faultList[i][12] = "WRONG"
+                                else:
+                                    faultList[i][12] = "INPROB2"
+
 # -------------------------------------- Generate the Output File ----------------------------------- #
 fileptr = open(options.application+"."+options.environment+".reportfile", 'w')
 
+# fileptr.write("%8s\n"%(len(faultList)))
+
 # header file
-fileptr.write("%8s %7s %10s %2s %18s %17s %28s %6s %25s %22s %18s %12s\n"%(
+fileptr.write("%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n"%(
         "Index","Type","Target","i","Insertion Time","Mask","Fault Injection Result",
         "Code", "Execution Time (Ticks)", "Executed Instructions", "Mem Inconsistency",
-        "Checkpoint"))
+        "Checkpoint", "Trace Variable"))
 
 # print faults
 for faultNumber in range(0,len(faultList)):
@@ -139,8 +235,9 @@ for faultNumber in range(0,len(faultList)):
     faultExecutedInstructions   = faultList[faultNumber][9]
     faultMemInconsistency       = faultList[faultNumber][10]
     faultCorrectCheckpoint      = faultList[faultNumber][11]
+    faultTraceVariable          = faultList[faultNumber][12]
 
-    fileptr.write("%7s %10s %6s %4s %15s %24s %25s %7s %20s %22s %14s %18s\n" % (
+    fileptr.write("%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n" % (
                     faultIndex,
                     faultType,
                     faultRegister,
@@ -152,7 +249,8 @@ for faultNumber in range(0,len(faultList)):
                     faultTicks,
                     faultExecutedInstructions,
                     faultMemInconsistency,
-                    faultCorrectCheckpoint
+                    faultCorrectCheckpoint,
+                    faultTraceVariable
                     ))
 
 spacing = 40
