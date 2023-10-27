@@ -57,6 +57,10 @@ function generateFaultList {
         if [[ -n "$REG_LIST" ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --reglist $REG_LIST"
         fi
+        # Vector Register list
+        if [[ -n "$VECTOR_REG_BITWIDTH" ]]; then
+                CMD_FAULT_LIST="$CMD_FAULT_LIST --vectorbw $VECTOR_REG_BITWIDTH"
+        fi
         # Not generating faults
         if [[ $GENERATE_FAULT_LIST -eq $NO_FAULTS ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --nobitflip"
@@ -82,6 +86,10 @@ function generateFaultList2 {
         # Register list
         if [[ -n "$REG_LIST" ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --registerlist $REG_LIST"
+        fi
+        # Vector Register list
+        if [[ -n "$VECTOR_REG_BITWIDTH" ]]; then
+                CMD_FAULT_LIST="$CMD_FAULT_LIST --vectorbw $VECTOR_REG_BITWIDTH"
         fi
         if [[ -n "$FUNCTION_INSTANCE" ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --traceinstance $FUNCTION_INSTANCE"
@@ -467,14 +475,14 @@ function configureCommands {
                                 ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
                                 ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
                                 ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
-                                RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
                                 *) echo "Invalid architecture"; exit ;;
                         esac
 
@@ -727,6 +735,7 @@ source config
 # configure the simulator command according with the options
 configureCommands
 configureOVP
+rm ovp.sh
 
 ################################################################################################
 ############################### Fault Campaign Began ###########################################

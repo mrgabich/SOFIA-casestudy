@@ -9,7 +9,7 @@ ARM_CORTEX_A5, ARM_CORTEX_A7, ARM_CORTEX_A8, ARM_CORTEX_A9,
 ARM_CORTEX_A53, ARM_CORTEX_A57, ARM_CORTEX_A72,
 RISCV32I, RISCV32IM, RISCV32IMAC, RISCV32GC,
 RISCV64IMAC, RISCV64GC'
-ARCHITECTURE=RISCV64GC
+ARCHITECTURE=RISCV64GCV
 
 
 : '
@@ -27,6 +27,7 @@ NUMBER_OF_FAULTS=32
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
+VECTOR_REG_BITWIDTH=512
 
 
 : '
@@ -60,7 +61,7 @@ Float v0-v31
 # For RISCV
 Int ra,sp,gp,tp,t0,t1,t2,s0,s1,a0,a1,a2,a3,a4,a5,a6,a7,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,t3,t4,t5,t6,pc
 '
-REG_LIST=t0,t1
+REG_LIST=t0,t1,t2,s0,s1,a0,a1,a2,v0,v1
 
 
 : '
@@ -203,18 +204,31 @@ export SIMULATOR_PATH=/home/${USER}/
 export CROSS_COMPILER_PATH=/home/${USER}/cross
 # Bare Metal
 ## Aarch32 - https://developer.arm.com/downloads/-/gnu-rm
-export ARM_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/aarch32_12.3
+export ARM_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_12.3
 export ARM_TOOLCHAIN_BAREMETAL_PREFIX=arm-none-eabi
 ## Aarch64 - https://developer.arm.com/downloads/-/gnu-a
-export AARCH64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/aarch64_12.3
+export AARCH64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_aarch64_12.3
+export AARCH64_TOOLCHAIN_BAREMETAL_PREFIX=aarch64-none-elf
 ## RISCV - https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack
-export RISCV_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32v_12.3
-export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
+#Baremetal
+## RISCV32
+export RISCV32_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_12.3
+export RISCV32_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
+## RISCV64
+export RISCV64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_12.3
+export RISCV64_TOOLCHAIN_BAREMETAL_PREFIX=riscv64-unknown-elf
 
 # Linux
 ## Aarch32
-export ARM_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/aarch32_linux_12.3
-export ARM_TOOLCHAIN_LINUX_PREFIX=arm-linux-gnueabi
+export ARM_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_12.3
+export ARM_TOOLCHAIN_LINUX_PREFIX=arm-none-linux-gnueabihf
 ## Aarch64
-export AARCH64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/aarch64_linux_12.3
-export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
+export AARCH64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_aarch64_12.3
+export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-none-linux-gnu
+# Linux
+## RISCV32
+export RISCV32_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_linux_12.3
+export RISCV32_TOOLCHAIN_LINUX_PREFIX=riscv32-unknown-linux-gnu
+## RISCV64
+export RISCV64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_linux_12.3
+export RISCV64_TOOLCHAIN_LINUX_PREFIX=riscv64-unknown-linux-gnu
