@@ -113,7 +113,7 @@ class harvester():
         fileptr = open(outputfile, 'w')
 
         # header file
-        fileptr.write("%8s %7s %10s %2s %18s %17s %28s %6s %25s %22s %18s %12s\n"%(
+        fileptr.write("%8s %7s %10s %2s %18s %130s %28s %6s %25s %22s %18s %12s\n"%(
                 "Index","Type","Target","i","Insertion Time","Mask","Fault Injection Result",
                 "Code", "Execution Time (Ticks)", "Executed Instructions", "Mem Inconsistency",
                 "Checkpoint"))
@@ -133,7 +133,7 @@ class harvester():
             faultMemInconsistency       = faultList[faultNumber][10]
             faultCorrectCheckpoint      = faultList[faultNumber][11]
 
-            fileptr.write("%7s %10s %6s %4s %15s %24s %25s %7s %20s %22s %14s %18s\n" % (
+            fileptr.write("%7s %10s %6s %4s %15s %130s %25s %7s %20s %22s %14s %18s\n" % (
                             faultIndex,
                             faultType,
                             faultRegister,

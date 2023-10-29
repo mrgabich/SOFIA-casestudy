@@ -216,7 +216,7 @@ fileptr = open(options.application+"."+options.environment+".reportfile", 'w')
 # fileptr.write("%8s\n"%(len(faultList)))
 
 # header file
-fileptr.write("%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n"%(
+fileptr.write("%8s %14s %10s %4s %18s %130s %28s %7s %25s %22s %18s %15s %15s\n"%(
         "Index","Type","Target","i","Insertion Time","Mask","Fault Injection Result",
         "Code", "Execution Time (Ticks)", "Executed Instructions", "Mem Inconsistency",
         "Checkpoint", "Trace Variable"))
@@ -237,7 +237,7 @@ for faultNumber in range(0,len(faultList)):
     faultCorrectCheckpoint      = faultList[faultNumber][11]
     faultTraceVariable          = faultList[faultNumber][12]
 
-    fileptr.write("%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n" % (
+    fileptr.write("%8s %14s %10s %4s %18s %130s %28s %7s %25s %22s %18s %15s %15s\n" % (
                     faultIndex,
                     faultType,
                     faultRegister,

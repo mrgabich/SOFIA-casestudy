@@ -36,7 +36,6 @@ Bool removeDumpFiles = True;
 Bool enableContexTrace      = False;
 
 // Temporary string
-#define MAX_VECTOR_REG_WIDTH 512
 #define STRING_SIZE 256
 #define TMP_STRING_SIZE 1024
 
@@ -417,8 +416,9 @@ void loadFaults() {
         if( fgets(tempString,STRING_SIZE,filePointer) == NULL ) opMessage("I",PREFIX_FIM,"Command execution error\n"); // @Error
 
         /// extract the info
-        sscanf(tempString,"%d %s %s %d "FMT_64u":%d "FMT_64x" \n",&PE.faultIdentifier,PE.faultTypeStr,PE.faultTarget,&PE.faultRegisterPosition,&PE.faultInsertionTime,&core,&PE.faultValue);
-
+        sscanf(tempString,"%d %s %s %d "FMT_64u":%d %s \n",&PE.faultIdentifier,PE.faultTypeStr,PE.faultTarget,&PE.faultRegisterPosition,&PE.faultInsertionTime,&core,PE.vecFaultValue);
+        // opPrintf("INFO: %s\n",PE.vecFaultValue);
+        PE.faultValue = atoi(PE.vecFaultValue);
         /// core to inject
         PE.coreToInject=PE.childrens[core];
         PE.faultDuration = 1; // @Review
@@ -446,7 +446,7 @@ void loadFaults() {
 
             /// set breakpoint
             opProcessorBreakpointICountSet(PE.coreToInject,PE.faultInsertionTime);
-            opMessage("I",PREFIX_FIM,"Loaded Fault %d "FMT_64u" 0x"FMT_64x" %d (%s) core %d\n",PE.faultIdentifier,PE.faultInsertionTime,PE.faultValue,PE.faultRegisterPosition,PE.faultRegister,core); // @Info
+            opMessage("I",PREFIX_FIM,"Loaded Fault %d "FMT_64u" 0x%s %d (%s) core %d\n",PE.faultIdentifier,PE.faultInsertionTime,PE.vecFaultValue,PE.faultRegisterPosition,PE.faultRegister,core); // @Info
 
         } else  if(MACRO_FAULTTYPE(TYPE_VARIABLE)) {
             opMessage("I",PREFIX_FIM,"Loaded Fault %d "FMT_64u" 0x"FMT_64x" %d TYPE %s\n",PE.faultIdentifier,PE.faultInsertionTime,PE.faultValue,PE.faultRegisterPosition,PE.faultTypeStr); // @Info
@@ -784,7 +784,7 @@ void createFaultInjectionReport() {
     FILE * pFile = fopen (reportFile,"w");
 
     /// create file header
-    fprintf(pFile,"%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n",
+    fprintf(pFile,"%8s %14s %10s %4s %18s %130s %28s %7s %25s %22s %18s %15s %15s\n",
             "Index","Type","Target","i","Insertion Time","Mask","Fault Injection Result",
             "Code", "Execution Time (Ticks)", "Executed Instructions", "Mem Inconsistency",
             "Checkpoint", "Trace Variable");
@@ -986,7 +986,7 @@ void createFaultInjectionReport() {
 
         sprintf(self_faultRegisterIndex,    "%u",PE.faultRegisterPosition);
         sprintf(self_faultTime,             ""FMT_64u"",PE.faultInsertionTime);
-        sprintf(self_faultMask,             ""FMT_64x"",PE.faultValue);
+        sprintf(self_faultMask,             "%s",PE.vecFaultValue);
         sprintf(self_faultAnalysis_name,    "%s",errorNames[code]);
         sprintf(self_faultAnalysis_value,   "%d",code);
         sprintf(self_ExecutedTicks,"0");                                    //Always zero in the OVP
@@ -994,7 +994,7 @@ void createFaultInjectionReport() {
         //sprintf(self_MemInconsistency,"%s");
         sprintf(self_correctCheckpoint,     ""FMT_64u"",checkpointLoaded+PE.instructionsToNormalExit);
 
-        fprintf(pFile,"%8s %14s %10s %4s %18s %18s %28s %7s %25s %22s %18s %15s %15s\n",
+        fprintf(pFile,"%8s %14s %10s %4s %18s %130s %28s %7s %25s %22s %18s %15s %15s\n",
                     self_faultIndex,
                     self_faultType,
                     self_faultRegister,
@@ -1047,13 +1047,9 @@ void handlerFaultInjection(Uns32 processorNumber) {
     Uns64 tempCount;
     Uns64 memAddress;
     Uns8  memValue;
-    Uns64 regTemp=0x0;
-    Uns64 vecRegTemp[(MAX_VECTOR_REG_WIDTH/64)];
-    Uns64 tvecRegTemp[(MAX_VECTOR_REG_WIDTH/64)];
-    for (int i=0; i<(MAX_VECTOR_REG_WIDTH/64);i++){
-        vecRegTemp[i]=0xFFFFFFFFFFFFFFFF;
-        tvecRegTemp[i]=0xAAAAAAAAAAAAAAAA+i+1;
-    }
+    // Uns64 regTemp=0x0;
+    char vecRegTemp[MAX_VECTOR_REG_WIDTH];
+
     switch(PE.status) {
     case BEFORE_INJECTION: { /// inject the fault
         /// next State
@@ -1089,30 +1085,24 @@ void handlerFaultInjection(Uns32 processorNumber) {
 
         /// insert the fault
         if(MACRO_FAULTTYPE(TYPE_REGISTER) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE2)) { //Register faults
-            if (!strcmp(PE.faultRegister, "v0")){
+            // if (!strcmp(PE.faultRegister, "v0")){
                 // Acquire the register
-                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,tvecRegTemp);
                 opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
-                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x" "FMT_64x" "FMT_64x" "FMT_64x" \n",PE.faultRegister,PE.faultValue, vecRegTemp[0],vecRegTemp[1],vecRegTemp[2],vecRegTemp[3]);
-                opPrintf("Reg %s Value "FMT_64x" before %s\n",PE.faultRegister,PE.faultValue,(char*) vecRegTemp);
-                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,&regTemp);
-                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x"\n",PE.faultRegister,PE.faultValue,regTemp);
+                // opPrintf("Reg %s Value "FMT_64x" before %s \n",PE.faultRegister,PE.faultValue, vecRegTemp);
                 // Apply the mask
-                //vecRegTemp= ~(vecRegTemp[0] ^ PE.faultValue);
+                for (int i=0;i<MAX_VECTOR_REG_WIDTH;i+=8){
+                    vecRegTemp[i]= ~(vecRegTemp[i] ^ PE.vecFaultValue[i]);
+                    vecRegTemp[i+1]= ~(vecRegTemp[i+1] ^ PE.vecFaultValue[i+1]);
+                    vecRegTemp[i+2]= ~(vecRegTemp[i+2] ^ PE.vecFaultValue[i+2]);
+                    vecRegTemp[i+3]= ~(vecRegTemp[i+3] ^ PE.vecFaultValue[i+3]);
+                    vecRegTemp[i+4]= ~(vecRegTemp[i+4] ^ PE.vecFaultValue[i+4]);
+                    vecRegTemp[i+5]= ~(vecRegTemp[i+5] ^ PE.vecFaultValue[i+5]);
+                    vecRegTemp[i+6]= ~(vecRegTemp[i+6] ^ PE.vecFaultValue[i+6]);
+                    vecRegTemp[i+7]= ~(vecRegTemp[i+7] ^ PE.vecFaultValue[i+7]);
+                }
                 // Writeback register
-                // opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,&vecRegTemp);
+                 opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
                 //~ opPrintf(" after "FMT_64x" \n",regTemp);
-            }else{
-                // Acquire the register
-                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,&regTemp);
-                opPrintf("Reg %s Value "FMT_64x" before "FMT_64x"\n",PE.faultRegister,PE.faultValue,regTemp);
-                // Apply the mask
-                regTemp= ~(regTemp ^ PE.faultValue);
-                // Writeback register
-                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,&regTemp);
-                //~ opPrintf(" after "FMT_64x" \n",regTemp);
-            }
-
         }else if ( MACRO_FAULTTYPE(TYPE_MEMORY2) || MACRO_FAULTTYPE(TYPE_VARIABLE2) || MACRO_FAULTTYPE(TYPE_FUNCTIONCODE) ){ // Virtual Memory faults
             // Acquire the address
             sscanf(PE.faultTarget,"%lX",&memAddress);

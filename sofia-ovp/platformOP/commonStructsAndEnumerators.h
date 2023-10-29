@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////////////////////////
 
 #define END_LIST "EndList@"
+#define MAX_VECTOR_REG_WIDTH 256 //Max vector register width in bytes
 char  possibleRegisters[128][10];
 int   numberOfRegistersToCompare;
 const char possibleRegistersV7[][10] ={"r0","r1","r2","r3","r4","r5","r6","r7","r8","r9","r10","r11","r12","sp","lr","pc","d0","d1","d2","d3","d4","d5","d6","d7","d8","d9","d10","d11","d12","d13","d14","d15",END_LIST};
@@ -41,7 +42,7 @@ typedef struct processorStruct {
 
     /// fault mask
     Uns64  faultValue;
-    // Uns64  vecFaultValue[(MAX_VECTOR_REG_WIDTH/64)];
+    char vecFaultValue[(MAX_VECTOR_REG_WIDTH)];
     
     /// faulty register information
     char   faultRegister[STRING_SIZE];

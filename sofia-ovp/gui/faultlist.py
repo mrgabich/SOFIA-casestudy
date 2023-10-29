@@ -85,7 +85,7 @@ class faultGenerator:
             # replace the old list
             targetregisters = copy.deepcopy(targetregistersRestrited)
             numregisters = len(targetregisters)
-            print(targetregisters)
+            # print(targetregisters)
 
             if self.options.eqdist: # generate the same number of faults for each registers in the list
                 if (self.options.numfaults % numregisters) == 0 :
@@ -214,43 +214,7 @@ class faultGenerator:
                     or self.options.environment==environmentsE.riscv64.name:
                     if self.options.dummy:
                         faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
-                    elif self.options.environment==environmentsE.riscv64.name:
-                        if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
-                            bit_array = np.ones(self.options.vecbw, dtype=np.uint8)
-                            if self.options.sequentialBits:
-                                maxN = (self.options.vecbw-1) - numFlips
-                                shift = randint(0,maxN)
-                                # vecOffset = targetBit % 64
-                                #mask64 = targetBit / 64
-                                # shift = targetBit / 64
-                                for x in range(shift, shift+numFlips): 
-                                    shiftValues.append(x)
-                            else:
-                                shiftValues = sample(range(0,(self.options.vecbw-1)), numFlips)
-                            for j in shiftValues:
-                                bit_array[j] ^= 1
-                            # Convert the bit array to bytes
-                            byte_array = np.packbits(bit_array)
-
-                            # Convert bytes to a hex string
-                            faultMask = byte_array.tobytes().hex()
-
-                            # Print the result
-                            print(faultMask)
-                        else:
-                            if self.options.sequentialBits:
-                                maxN = (archregisters.busWidth-1) - numFlips
-                                shift = randint(0,maxN)
-                                for x in range(shift, shift+numFlips): 
-                                    shiftValues.append(x)
-                            else:
-                                shiftValues = sample(range(0,63), numFlips)
-                            for j in shiftValues:
-                                masks.append(ctypes.c_uint64(~(0x1 << j)))
-                            faultMask = masks[0]
-                            for j in range (1, numFlips):
-                                faultMask = ctypes.c_uint64(faultMask.value & masks[j].value)
-                    elif targetregisters[faultRegisterIndex][1]=="pc":
+                    elif self.options.environment==environmentsE.ovparmv8.name and targetregisters[faultRegisterIndex][1]=="pc":
                         if self.options.sequentialBits:
                             maxN = (archregisters.busWidth-7) - numFlips
                             shift = randint(0,maxN)
@@ -263,6 +227,21 @@ class faultGenerator:
                         faultMask = masks[0]
                         for j in range (1, numFlips):
                             faultMask = ctypes.c_uint64(faultMask.value & masks[j].value)
+                    elif targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                        bit_array = np.ones(self.options.vecbw, dtype=np.uint8)
+                        if self.options.sequentialBits:
+                            maxN = (self.options.vecbw-1) - numFlips
+                            shift = randint(0,maxN)
+                            for x in range(shift, shift+numFlips):
+                                shiftValues.append(x)
+                        else:
+                            shiftValues = sample(range(0,(self.options.vecbw-1)), numFlips)
+                        for j in shiftValues:
+                            bit_array[j] ^= 1
+                        # Convert the bit array to bytes
+                        byte_array = np.packbits(bit_array)
+                        # Convert bytes to a hex string
+                        faultMask = byte_array.tobytes().hex()
                     else:
                         if self.options.sequentialBits:
                             maxN = (archregisters.busWidth-1) - numFlips
@@ -270,7 +249,7 @@ class faultGenerator:
                             for x in range(shift, shift+numFlips): 
                                 shiftValues.append(x)
                         else:
-                            shiftValues = sample(range(0,63), numFlips)
+                            shiftValues = sample(range(0,(self.options.vecbw-1)), numFlips)
                         for j in shiftValues:
                             masks.append(ctypes.c_uint64(~(0x1 << j)))
                         faultMask = masks[0]
