@@ -669,6 +669,53 @@ function configureCommands {
                                         esac
 
                                         ;; # End ARMv8
+                                        RV64GC | RV64GCV)
+                                        # Environment
+                                        export ENVIRONMENT=riscv64
+
+                                        # # MPI library
+                                        # export MPI_LIB=$SUPPORT_FOLDER/mpich-3.2-armv8 # Mpi library path
+                                        # export MPICALLER=armv8-linux-gnueabi-mpirun # Mpi app caller
+
+                                        # # Copy the tcl module
+                                        # cp -rf "$MODULE_FOLDER/module.op.tcl.linux64" "$MODULE_FOLDER/module.op.tcl"
+
+                                        # export LINUX_FOLDER=$SUPPORT_FOLDER/linux-armv8 # Linux support folder
+                                        # export LINUX_IMAGES_FOLDER=$LINUX_FOLDER/disks # Folder with the full-system images
+                                        # export LINUX_IMAGE_ORIGINAL=initrd.arm64.img # Kernel binary
+                                        # export LINUX_IMAGE=$LINUX_IMAGE_ORIGINAL.$WORKLOAD_TYPE.$ENVIRONMENT.$NUM_CORES # Loaded image - temporary -> no git track
+                                        # export LINUX_KERNEL=Image.defconfig # Linux image
+                                        # export LINUX_VKERNEL=vmlinux.defconfig # Linux kernel
+                                        # export LINUX_BOOTLOADER="" # Linux boatloader binary
+                                        # export LINUX_HOME_ROOT=root # Target linux root folder
+                                        # export LINUX_RUNSCRIPT=run.sh # Script responsible to call the application inside the linux
+                                        # export OVPFIM_EXEC=$OVP_FIM/OVPFIM-ARMv8.elf # Runtime fim caller
+
+                                        # # CrossCompiler Linux AARCH64
+                                        # #~ export ARM_TOOLCHAIN_LINUX=/usr
+                                        # #~ export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
+
+                                        # # The arm A72 requires a different dtb
+                                        # if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]]; then
+                                        #         export LINUX_DTB=foundation-v8-gicv3.dtb # Dtb files
+                                        # else
+                                        #         export LINUX_DTB=foundation-v8.dtb # Dtb files
+                                        # fi
+
+                                        # CMD_OVP="$CMD_OVP --mode linux64 --linuxdtb $LINUX_DTB --startaddress 0x80000000 --arch multicore"
+
+                                        # case "$ARCHITECTURE" in
+                                        #         RV64GC) CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
+                                        #         RV64GCV) CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
+                                        # esac
+
+                                        # # Define the workload path
+                                        # case "$WORKLOAD_TYPE" in
+                                        #         WORKLOAD_LINUX) APPLICATIONS_FOLDER=$WORKLOADS/linux;;
+                                        #         *) echo "Invalid Workload!"; exit ;;
+                                        # esac
+
+                                        ;; # End RISC-V
                                 *) echo "Invalid Workload processor match"; exit ;;
                         esac
 
