@@ -203,7 +203,7 @@ IMPERAS_VERSION=20230524
 Cross Compiler configuration
 '
 # Compiler optimization flag
-export OPTFLAG=3
+export OPTFLAG=2
 #Target Simulator PATH
 export SIMULATOR_PATH=/home/${USER}/
 # Cross Compiler PATH

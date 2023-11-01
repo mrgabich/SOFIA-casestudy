@@ -1,1 +1,1 @@
-CFLAGS+= -march=rv64gcv_zfh -flax-vector-conversions -static
+CFLAGS+= -march=rv64gcv -static

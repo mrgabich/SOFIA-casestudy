@@ -1,1 +1,1 @@
-CFLAGS+= -march=rv64gcv_zfh_Zvl512b -flax-vector-conversions -static -DUSE_RISCV_VECTOR
+CFLAGS+= -march=rv64gcv_zfh_zvl512b -flax-vector-conversions -static -DUSE_RISCV_VECTOR -I$(BAREMETAL_FOLDER)/rvv

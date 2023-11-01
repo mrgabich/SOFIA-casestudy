@@ -522,7 +522,7 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
 int main(){
     FIM_Instantiate();
     
-    char * argv[] = {{" "},{"-x"},{"16"},{"-y"},{"16"},{"-z"},{"2"},{"-np"},{"64"}};
+    char * argv[] = {{" "},{"-x"},{"128"},{"-y"},{"128"},{"-z"},{"2"},{"-np"},{"256"}};
     int argc = 9;
 	char* usage = "openmp.out -x <dimX> -y <dimY> -z <Nfr> -np <Nparticles>";
 	//check number of arguments
