@@ -30,17 +30,17 @@ for {set i 0} {$i < 1} {incr i} {
     ihwaddprocessor -instancename cpu${i} -type $::env(armType) -vendor $vendor -version $version -endian little -semihostname $::env(armSemihost) -mips 100.0
 
     #Main Bus
-    ihwaddbus       -instancename mainBus${i}   -addresswidth 32
+    ihwaddbus       -instancename mainBus${i}   -addresswidth 63
     
     #Connections --> MPx cores
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport INSTRUCTION
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
-    # Override default value of enableVFPAtReset to 1: Enable FPU
-    ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
-    
+    # Override default value of mstatus.FS to 1: Enable FPU
+    ihwsetparameter -handle cpu${i} -name mstatus_FS -type Uns32 -value 1
+
     #RAM
     ihwaddmemory -instancename ram${i} -type ram
-    ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffff
+    ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0x7fffffffffffffff
 
 
 }

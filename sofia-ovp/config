@@ -21,13 +21,19 @@ NUM_CORES=1
 
 
 : '
+Bit width Size of vector Registers
+*Only available for Risc-V Vector Extension and Arm SVE compatible cores
+'
+VECTOR_REG_BITWIDTH=512
+
+
+: '
 Number of NUMBER_OF_FAULTS that equals to the number of injected faults
 '
 NUMBER_OF_FAULTS=32
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
-VECTOR_REG_BITWIDTH=512
 
 
 : '
@@ -215,7 +221,7 @@ export AARCH64_TOOLCHAIN_BAREMETAL_PREFIX=aarch64-none-elf
 export RISCV32_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_12.3
 export RISCV32_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
 ## RISCV64
-export RISCV64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_12.3
+export RISCV64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_13.2
 export RISCV64_TOOLCHAIN_BAREMETAL_PREFIX=riscv64-unknown-elf
 
 # Linux

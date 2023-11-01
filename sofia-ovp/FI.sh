@@ -490,7 +490,12 @@ function configureCommands {
                         export BAREMETAL_FOLDER=$SUPPORT_FOLDER/baremetal
 
                         # Copy the tcl module bare metal
-                        cp -rf "$MODULE_FOLDER/module.op.tcl.baremetal" "$MODULE_FOLDER/module.op.tcl"
+                        if [[ "$ARCHITECTURE" = 'RISCV64GC' ]]|| \
+				[[ "$ARCHITECTURE" = 'RISCV64GCV' ]] ; then
+                                cp -rf "$MODULE_FOLDER/module.op.tcl.baremetalRV64" "$MODULE_FOLDER/module.op.tcl"
+                        else
+                                cp -rf "$MODULE_FOLDER/module.op.tcl.baremetal" "$MODULE_FOLDER/module.op.tcl"
+                        fi
 
                         # Applications source
                         APPLICATIONS_FOLDER=$WORKLOADS/baremetal
