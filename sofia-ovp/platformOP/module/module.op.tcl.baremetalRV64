@@ -37,6 +37,8 @@ for {set i 0} {$i < 1} {incr i} {
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
     # Override default value of mstatus.FS to 1: Enable FPU
     ihwsetparameter -handle cpu${i} -name mstatus_FS -type Uns32 -value 1
+    # Override default value of mstatus.VS to 1: Enable VE
+    ihwsetparameter -handle cpu${i} -name mstatus_VS -type Uns32 -value 1
 
     #RAM
     ihwaddmemory -instancename ram${i} -type ram
