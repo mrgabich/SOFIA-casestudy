@@ -1,0 +1,1 @@
+CFLAGS+= -march=rv64gcv_zfh -flax-vector-conversions -static -DUSE_RISCV_VECTOR

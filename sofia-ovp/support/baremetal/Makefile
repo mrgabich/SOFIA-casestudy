@@ -16,6 +16,7 @@ INCOBJ=$(patsubst %.c,%$(MULT).$(CROSS).o,$(SRCINC))
 EXE=$(patsubst %.c,%$(MULT).$(CROSS).elf,$(SRC))
 
 -include $(BAREMETAL_FOLDER)/$(CROSS).makefile.include
+-include Makefile.include
 
 all: $(EXE)
 
