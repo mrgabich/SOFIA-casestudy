@@ -1,6 +1,8 @@
-SOFIA Framework [![License][license-img]][license-url]
+This is a fork from ([SOFIA Framework](https://github.com/ManyCoreResearchTeam/SOFIA)) [![License][license-img]][license-url] 
 =
-The SOFIA (SOft error Fault Injection Analysis) framework supports fast and early soft error assessment, diagnosis and susceptibility reduction evaluation through the application of software-based mitigation techniques. SOFIA offers a wide range of soft error evaluation opportunities that go beyond the classical toolsets, furthering potential advantages that fill the gap between the available tools and the industry requirements.
+This repository is maintained by [**Geancarlo Abich**](https://www.linkedin.com/in/geancarloabich/) <a href="https://github.com/mrgabich" target="_blank"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"></a>&nbsp;&nbsp;&nbsp;
+=
+The SOFIA (SOft error Fault Injection Analysis) framework supports fast and early soft error assessment, diagnosis, and susceptibility reduction evaluation through the application of software-based mitigation techniques. SOFIA offers a wide range of soft error evaluation opportunities that go beyond the classical toolsets, furthering potential advantages that fill the gap between the available tools and the industry requirements.
 
 
 ## Suggested citation
