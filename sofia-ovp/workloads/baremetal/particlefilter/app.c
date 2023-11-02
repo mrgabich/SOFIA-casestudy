@@ -605,8 +605,8 @@ int main(){
 	printf("PARTICLE FILTER TOOK %f\n", elapsed_time(endVideoSequence, endParticleFilter));
 	printf("ENTIRE PROGRAM TOOK %f\n", elapsed_time(start, endParticleFilter));
 	
-	free(seed);
-	free(I);
 	FIM_exit();
+	// free(seed);
+	// free(I);
 	return 0;
 }

@@ -80,7 +80,7 @@ enum {
     FIM_SR_Hard_Fault,                  // Hard fault handler triggered
     FIM_SR_LOCKUP,                      // Lockup error (only for M3/M4)
     FIM_SR_HANG,                        // Hang detection
-    FIM_SR_SDC,                        // Hang detection
+    FIM_SR_SDC,                         // Hang detection
     FIM_SR_SDC2,                        // Hang detection
     FIM_SR_SDC3,                        // Hang detection
     FIM_SR_DMA_ERROR,                   // DMA Error for use the NOC

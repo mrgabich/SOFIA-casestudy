@@ -30,7 +30,7 @@ VECTOR_REG_BITWIDTH=512
 : '
 Number of NUMBER_OF_FAULTS that equals to the number of injected faults
 '
-NUMBER_OF_FAULTS=32
+NUMBER_OF_FAULTS=17000
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
@@ -67,7 +67,7 @@ Float v0-v31
 # For RISCV
 Int ra,sp,gp,tp,t0,t1,t2,s0,s1,a0,a1,a2,a3,a4,a5,a6,a7,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,t3,t4,t5,t6,pc
 '
-REG_LIST=t0,t1,t2,s0,s1,a0,a1,a2,v0,v1
+REG_LIST=
 
 
 : '
@@ -86,6 +86,14 @@ variable2 -> Trace and inject fault the virtual memory region of the variable
 '
 FAULT_TYPE=register
 MEMORY_OPTIONS=
+
+: '
+Output data structure harvesting
+Output data type size in bits
+'
+OUTPUTDATA=""
+OUTPUTDATA_SIZE=
+OUTPUTDATA_OFFSET=
 
 
 : '

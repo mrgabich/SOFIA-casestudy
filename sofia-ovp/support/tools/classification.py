@@ -97,6 +97,22 @@ class errorAnalysisDACShort(Enum):
     UT,\
     Hang = list(range(5))
 
+class errorAnalysisNNShort(Enum):
+    CORRECT,\
+    INPROB1,\
+    INPROB2,\
+    WRONG,\
+    NOPRED,\
+    ERROR = list(range(6))
+
+class errorAnalysisML(Enum):
+    Correct,\
+    Incorrect_Probability_Soft,\
+    Incorrect_Probability_Hard,\
+    Wrong_Probability,\
+    No_Prediction,\
+    UT_Hang = list(range(6))
+
 class simulationStatesE (Enum):
     FIM_GOLD_EXECUTION,\
     FIM_GOLD_PROFILING,\

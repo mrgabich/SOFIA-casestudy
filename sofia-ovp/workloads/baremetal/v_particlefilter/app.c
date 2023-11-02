@@ -977,7 +977,7 @@ int main(){
     printf("ENTIRE PROGRAM TOOK %f\n", elapsed_time(start, endParticleFilter));
     
 	FIM_exit();
-    free(seed);
-    free(I);
+    // free(seed);
+    // free(I);
 	return 0;
 }

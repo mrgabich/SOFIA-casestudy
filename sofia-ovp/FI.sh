@@ -43,10 +43,16 @@ function callHarvestLocal {
                            --application "$CURRENT_APPLICATION" \
                            --executiontime "$nsFaultCampaignBegin" \
                            --cores "$NUM_CORES" --cputype "$CPU_TYPE" \
-                           --environment "$ENVIRONMENT"
+                           --environment "$ENVIRONMENT" \
+                           #--outputdata         $OUTPUTDATA \
+                           #--outputdatasize     $OUTPUTDATA_SIZE \
+                           #--outputdataoffset   $OUTPUTDATA_OFFSET
 
         $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
-                           --groupsdac
+                           --groupsdac --application $CURRENT_APPLICATION
+
+        $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
+                           --groupsnn --application $CURRENT_APPLICATION
 
 }
 
@@ -209,7 +215,7 @@ function compileApplication {
         cp -rf "$PLATFORM_FOLDER/harness/harness.$IMPERAS_ARCH.exe" .
 
         # Create infrastructure folders
-        mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling
+        mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling ./Traces
         # New variable for arguments
         SIM_ARGS=
         # In some makefile is definied CROSS
@@ -851,6 +857,11 @@ do
         # SIM_ARGS+=" --tracesymbol p --override FIM/DUT0/eth0/tapDevice=tap0 "
         if [[ -n "$SYMBOL" ]]; then
                 SIM_ARGS+=" --tracesymbol $SYMBOL"
+        fi
+
+        if [[ -n "$OUTPUTDATA" ]]; then
+                echo "Output data: $OUTPUTDATA"
+                SIM_ARGS+=" --tracevariable $OUTPUTDATA"
         fi
 
         # Setup gold command
