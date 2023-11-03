@@ -391,7 +391,7 @@ function configureCommands {
         export PROJECT_FOLDER="$PWD"
 
         # Working space folder
-        export WORKSPACE="$PROJECT_FOLDER/workspace"
+        export WORKSPACE="$PROJECT_FOLDER/workspace_$HOSTNAME"
 
         # Workloads folder
         export WORKLOADS="$PROJECT_FOLDER/workloads"

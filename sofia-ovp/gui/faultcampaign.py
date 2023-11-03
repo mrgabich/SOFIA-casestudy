@@ -81,7 +81,9 @@ class faultCampaign():
     def configuration(self):
         # Acquire the current folder and derive some default paths
         self.dirproject=subprocess.check_output("pwd",shell=True,).rstrip('\n')
-        self.dirworkspace=self.dirproject+"/workspace"
+        hostname = subprocess.check_output("hostname", shell=True).decode("UTF-8")
+        hostname = hostname.rstrip("\n")
+        self.dirworkspace=self.dirproject+"/workspace_"+hostname
         self.dirworkload =self.dirproject+"/workloads"
         self.dirsupport  =self.dirproject+"/support"
 

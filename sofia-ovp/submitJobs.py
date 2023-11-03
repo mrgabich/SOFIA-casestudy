@@ -142,8 +142,8 @@ def transferWorkspace():
     for i in serverPath:
         server, folder = i
         opt = space + "-r --delete"
-        src = space + "../../workspace/" + args.application
-        dst = space + server + ":" + folder + "workspace/"
+        src = space + "../../workspace_"+server+"/" + args.application
+        dst = space + server + ":" + folder + "workspace_"+server+"/"
         cmd = "rsync" + opt + src + dst
         subprocess.call(cmd, shell=True)
 
@@ -192,7 +192,7 @@ def runGold(application, goldExecute, path, serverPath):
     space = " "
     hostname = getHostname()
     ovpFolder = serverPath[hostname]
-    os.chdir(ovpFolder + "/workspace/" + application)
+    os.chdir(ovpFolder + "/workspace_"+hostname+"/" + application)
     logfile = open('PlatformLogs/platform-' + str(0), 'w+')
     path = path[:-1]
     ovpFolder = ovpFolder[:-1]
@@ -245,7 +245,7 @@ def runHarness(pid, application, execute, path, serverPath):
     space = " "
     hostname = getHostname()
     ovpFolder = serverPath[hostname]
-    os.chdir(ovpFolder + "/workspace/" + application)
+    os.chdir(ovpFolder + "/workspace_"+hostname+"/" + application)
     logfile = open('PlatformLogs/platform-' + str(pid), 'w+')
     path = path[:-1]
     ovpFolder = ovpFolder[:-1]
@@ -324,7 +324,7 @@ def checkServerLicense(serverPath, application):
     pids = []
     hostname = getHostname()
     ovpFolder = serverPath[hostname]
-    os.chdir(ovpFolder + "workspace/" + application + "/PlatformLogs")
+    os.chdir(ovpFolder + "workspace_"+hostname+"/" + application + "/PlatformLogs")
 
     if os.path.isfile('./errors'):
         subprocess.call("rm errors", shell=True)
@@ -344,7 +344,7 @@ def checkHangs():
     pids = []
     hostname = getHostname()
     ovpFolder = serverPath[hostname]
-    os.chdir(ovpFolder + "workspace/")
+    os.chdir(ovpFolder + "workspace_"+hostname+"/")
     if os.path.isfile('./errors'):
         subprocess.call("rm errors", shell=True)
     subprocess.call(
@@ -379,9 +379,9 @@ def checkLicenseErrors():
 
 def recoverReports(serverPath, server, localPath):
     ovpFolder = serverPath[server]
-    os.chdir(localPath + "workspace/" + args.application + "/Reports")
+    os.chdir(localPath + "workspace_"+server+"/" + args.application + "/Reports")
     reportsFolder = "/Reports"
-    workspace = "workspace/" + args.application + reportsFolder
+    workspace = "workspace_"+server+"/" + args.application + reportsFolder
     path = ovpFolder + workspace
     scp = "scp" + space + server + ":" + path
     getAllReports = scp + "/*"
@@ -391,9 +391,9 @@ def recoverReports(serverPath, server, localPath):
 
 def recoverPlatformLogs(serverPath, server, localPath):
     ovpFolder = serverPath[server]
-    os.chdir(localPath + "workspace/" + args.application + "/PlatformLogs")
+    os.chdir(localPath + "workspace_"+server+"/" + args.application + "/PlatformLogs")
     platformsFolder = "/PlatformLogs"
-    workspace = "workspace/" + args.application + platformsFolder
+    workspace = "workspace_"+server+"/" + args.application + platformsFolder
     path = ovpFolder + workspace
     scp = "scp" + space + server + ":" + path
     getAllPlatforms = scp + "/*"

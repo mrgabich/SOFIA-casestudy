@@ -40,7 +40,9 @@ class noguiFaultInection():
     def run(self):
         outputFI = Queue.Queue()
         FI = faultCampaign(options=self.options,terminal=outputFI)
-        logfile="./workspace/logfile"
+        hostname = subprocess.check_output("hostname", shell=True).decode("UTF-8")
+        hostname = hostname.rstrip("\n")
+        logfile="./workspace_"+hostname+"/logfile"
 
         threadFI = threading.Thread(target=FI.run,)
         threadFI.start()

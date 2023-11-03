@@ -78,8 +78,8 @@ See example [here](https://github.com/ManyCoreResearchTeam/SOFIA/blob/main/sofia
     * > Example: ./FI.sh factorial
 
 3. **FI results Analysis**.
-    * Check the results in workspace/appname/*reportfile
-    * Check image plot in workspace/appname/groupsdac.eps
+    * Check the results in workspace_hostname/appname/*reportfile
+    * Check image plot in workspace_hostname/appname/groupsdac.eps
     * If you have prints in your code, you can see it in PlatformLogs/uart0-x for Linux and PlatformLogs/platform-x for bare metal
 
 
