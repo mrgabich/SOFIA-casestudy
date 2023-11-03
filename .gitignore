@@ -1,4 +1,4 @@
-workspace
+workspac*
 *.igen.*
 module.op.tcl
 *.pyc
