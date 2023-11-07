@@ -1,0 +1,14 @@
+
+IMPERAS_RISCV_TGT=RISCV64GCV
+
+ifeq ($(CC_TYPE),GCC)
+    RISCV64GCV_CFLAGS    = -mabi=lp64d -march=rv64gcv
+else
+    RISCV64GCV_CFLAGS    = -mabi=lp64d -march=rv64gcv_zfh_zvl512b -mcpu=sifive-x280 --gcc-toolchain=${GCC_TOOLCHAIN_DIR} --target=riscv64-unknown-elf -DVWIDTH=16 -menable-experimental-extensions 
+endif
+
+# Target Library
+RISCV64GCV_TL        = riscv64d-elf
+RISCV64GCV_TL_SUBDIR = 
+
+include $(BAREMETAL_FOLDER)/RISCV64.makefile.include
