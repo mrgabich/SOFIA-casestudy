@@ -7,4 +7,4 @@ RISCV64GC_CFLAGS    = -mabi=lp64d -march=rv64gc
 RISCV64GC_TL        = riscv64d-elf
 RISCV64GC_TL_SUBDIR = 
 
-include $(BAREMETAL_FOLDER)/RISCV.makefile.include
+include $(BAREMETAL_FOLDER)/RISCV64.makefile.include

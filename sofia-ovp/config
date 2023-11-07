@@ -8,7 +8,7 @@ ARM_CORTEX_M7, ARM_CORTEX_M7F, ARM_CORTEX_M33, ARM_CORTEX_M33F,
 ARM_CORTEX_A5, ARM_CORTEX_A7, ARM_CORTEX_A8, ARM_CORTEX_A9, 
 ARM_CORTEX_A53, ARM_CORTEX_A57, ARM_CORTEX_A72,
 RISCV32I, RISCV32IM, RISCV32IMAC, RISCV32GC,
-RISCV64IMAC, RISCV64GC'
+RISCV64IMAC, RISCV64GC, RISCV64GCV, SIFIVEX280'
 ARCHITECTURE=RISCV64GCV
 
 
@@ -147,7 +147,7 @@ LI_OPTIONS=LI_USE_CLEAN
 : '
 Execute only gold simulation
 '
-ONLY_GOLD=0
+ONLY_GOLD=1
 
 
 : '
@@ -173,7 +173,7 @@ ENABLE_PROFILING=0
 : '
 # Quantum / Time-Slice
 '
-TIME_SLICE=0.001
+TIME_SLICE=0.000001
 
 
 : '
@@ -212,37 +212,83 @@ Cross Compiler configuration
 '
 # Compiler optimization flag
 export OPTFLAG=2
+# Compiler type: llvm or gcc
+export CC_TYPE="GCC"
 #Target Simulator PATH
 export SIMULATOR_PATH=/home/${USER}/
 # Cross Compiler PATH
 export CROSS_COMPILER_PATH=/home/${USER}/cross
-# Bare Metal
-## Aarch32 - https://developer.arm.com/downloads/-/gnu-rm
-export ARM_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_12.3
-export ARM_TOOLCHAIN_BAREMETAL_PREFIX=arm-none-eabi
-## Aarch64 - https://developer.arm.com/downloads/-/gnu-a
-export AARCH64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_aarch64_12.3
-export AARCH64_TOOLCHAIN_BAREMETAL_PREFIX=aarch64-none-elf
-## RISCV - https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack
-#Baremetal
-## RISCV32
-export RISCV32_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_12.3
-export RISCV32_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
-## RISCV64
-export RISCV64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_13.2
-export RISCV64_TOOLCHAIN_BAREMETAL_PREFIX=riscv64-unknown-elf
 
-# Linux
-## Aarch32
-export ARM_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_12.3
-export ARM_TOOLCHAIN_LINUX_PREFIX=arm-none-linux-gnueabihf
-## Aarch64
-export AARCH64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_aarch64_12.3
-export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-none-linux-gnu
-# Linux
-## RISCV32
-export RISCV32_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_linux_12.3
-export RISCV32_TOOLCHAIN_LINUX_PREFIX=riscv32-unknown-linux-gnu
-## RISCV64
-export RISCV64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_linux_12.3
-export RISCV64_TOOLCHAIN_LINUX_PREFIX=riscv64-unknown-linux-gnu
+export LLVM_TOOLCHAIN_DIR=${CROSS_COMPILER_PATH}/llvm/clang_17.0.4
+export LLVM_TOOLCHAIN_PREFIX=llvm
+
+if [[ "$CC_TYPE" = "GCC" ]]; then
+    #Baremetal
+    ## Aarch32 - https://developer.arm.com/downloads/-/gnu-rm
+    export ARM_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_12.3
+    export ARM_TOOLCHAIN_BAREMETAL_PREFIX=arm-none-eabi
+    ## Aarch64 - https://developer.arm.com/downloads/-/gnu-a
+    export AARCH64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/arm_gcc_aarch64_12.3
+    export AARCH64_TOOLCHAIN_BAREMETAL_PREFIX=aarch64-none-elf
+    ## RISCV - https://github.com/riscv-collab/riscv-gnu-toolchain
+    ## RISCV32
+    export RISCV32_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_12.3
+    export RISCV32_TOOLCHAIN_BAREMETAL_PREFIX=riscv32-unknown-elf
+    ## RISCV64
+    export RISCV64_TOOLCHAIN_BAREMETAL=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_13.2
+    export RISCV64_TOOLCHAIN_BAREMETAL_PREFIX=riscv64-unknown-elf
+
+    # Linux
+    ## Aarch32
+    export ARM_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_12.3
+    export ARM_TOOLCHAIN_LINUX_PREFIX=arm-none-linux-gnueabihf
+    ## Aarch64
+    export AARCH64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_aarch64_12.3
+    export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-none-linux-gnu
+    ## RISCV32
+    export RISCV32_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_linux_12.3
+    export RISCV32_TOOLCHAIN_LINUX_PREFIX=riscv32-unknown-linux-gnu
+    ## RISCV64
+    export RISCV64_TOOLCHAIN_LINUX=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_linux_12.3
+    export RISCV64_TOOLCHAIN_LINUX_PREFIX=riscv64-unknown-linux-gnu
+else
+    #Baremetal
+    #Arm
+    ## Aarch32
+    export ARM_TOOLCHAIN_BAREMETAL=${LLVM_TOOLCHAIN_DIR}
+    export AARCH32_GCC_TOOLCHAIN_DIR=${CROSS_COMPILER_PATH}/gcc/arm_gcc_12.3
+    export ARM_TOOLCHAIN_BAREMETAL_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    ## Aarch64
+    export AARCH64_TOOLCHAIN_BAREMETAL=${LLVM_TOOLCHAIN_DIR}
+    export AARCH64_GCC_TOOLCHAIN_DIR=${CROSS_COMPILER_PATH}/gcc/arm_gcc_aarch64_12.3
+    export AARCH64_TOOLCHAIN_BAREMETAL_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    #RISC-V
+    ## riscv32
+    export RISCV32_TOOLCHAIN_BAREMETAL=${LLVM_TOOLCHAIN_DIR}
+    export RISCV32_GCC_TOOLCHAIN_DIR=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_13.2
+    export RISCV32_TOOLCHAIN_BAREMETAL_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    ## riscv64
+    export RISCV64_TOOLCHAIN_BAREMETAL=${LLVM_TOOLCHAIN_DIR}
+    export RISCV64_GCC_TOOLCHAIN_DIR=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_13.2
+    export RISCV64_TOOLCHAIN_BAREMETAL_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+
+    #Linux
+    #Arm
+    ## Aarch32
+    export ARM_TOOLCHAIN_LINUX=${LLVM_TOOLCHAIN_DIR}
+    export AARCH32_GCC_TOOLCHAIN_LINUX_DIR=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_12.3
+    export ARM_TOOLCHAIN_LINUX_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    ## Aarch64
+    export AARCH64_TOOLCHAIN_LINUX=${LLVM_TOOLCHAIN_DIR}
+    export AARCH64_GCC_TOOLCHAIN_LINUX_DIR=${CROSS_COMPILER_PATH}/gcc/arm_gcc_linux_aarch64_12.3
+    export AARCH64_TOOLCHAIN_LINUX_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    #RISC-V
+    ## riscv32
+    export RISCV32_TOOLCHAIN_LINUX=${LLVM_TOOLCHAIN_DIR}
+    export RISCV32_TOOLCHAIN_LINUX_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    export RISCV32_GCC_TOOLCHAIN_LINUX_DIR=${CROSS_COMPILER_PATH}/gcc/riscv32gcv_linux_13.2
+    ## riscv64
+    export RISCV64_TOOLCHAIN_LINUX=${LLVM_TOOLCHAIN_DIR}
+    export RISCV64_TOOLCHAIN_LINUX_PREFIX=${LLVM_TOOLCHAIN_PREFIX}
+    export RISCV64_GCC_TOOLCHAIN_LINUX_DIR=${CROSS_COMPILER_PATH}/gcc/riscv64gcv_linux_13.2
+fi

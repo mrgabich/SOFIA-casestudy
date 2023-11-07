@@ -477,18 +477,19 @@ function configureCommands {
                                 ARM_CORTEX_M7) CPU_VARIANT=Cortex-M7; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
                                 ARM_CORTEX_M7F) CPU_VARIANT=Cortex-M7F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
                                 ARM_CORTEX_M33) CPU_VARIANT=Cortex-M33; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M33F) CPU_VARIANT=Cortex-M33F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
-                                ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
-                                ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel;;
-                                RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV32_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV32_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
-                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; export RISCV_TOOLCHAIN_BAREMETAL=${RISCV64_TOOLCHAIN_BAREMETAL}; export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=${RISCV64_TOOLCHAIN_BAREMETAL_PREFIX};;
+                                ARM_CORTEX_M33F) CPU_VARIANT=Cortex-M33F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAnge; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                SIFIVEX280) CPU_VARIANT=X280; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=sifive.ovpworld.org;;
                                 *) echo "Invalid architecture"; exit ;;
                         esac
 
@@ -496,8 +497,9 @@ function configureCommands {
                         export BAREMETAL_FOLDER=$SUPPORT_FOLDER/baremetal
 
                         # Copy the tcl module bare metal
-                        if [[ "$ARCHITECTURE" = 'RISCV64GC' ]]|| \
-				[[ "$ARCHITECTURE" = 'RISCV64GCV' ]] ; then
+                        if [[ "$ARCHITECTURE" = 'RISCV64GC' ]] || \
+				[[ "$ARCHITECTURE" = 'RISCV64GCV' ]] || \
+				[[ "$ARCHITECTURE" = 'SIFIVEX280' ]] ; then
                                 cp -rf "$MODULE_FOLDER/module.op.tcl.baremetalRV64" "$MODULE_FOLDER/module.op.tcl"
                         else
                                 cp -rf "$MODULE_FOLDER/module.op.tcl.baremetal" "$MODULE_FOLDER/module.op.tcl"
