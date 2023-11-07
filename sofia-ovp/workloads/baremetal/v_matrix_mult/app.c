@@ -121,6 +121,10 @@ void Multiply(matrix A, matrix B, matrix Res)
       for (Inner = 0; Inner < UPPERLIMIT; Inner++)
       {
          Res [Outer][Inner] = 0;
+         #pragma clang align
+         #pragma clang loop unroll(enable)
+         #pragma clang loop vectorize(enable) interleave(enable)
+         #pragma clang loop vectorize_width(VWIDTH)
          for (Index = 0; Index < UPPERLIMIT; Index++)
             Res[Outer][Inner]  +=
                A[Outer][Index] * B[Index][Inner];
