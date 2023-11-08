@@ -1,1 +1,6 @@
-CFLAGS+= -march=rv64gcv_zfh -flax-vector-conversions -static
+ifeq ($(CC_TYPE),GCC)
+CFLAGS+= -fno-tree-vectorize -DNINPUT=65536
+else
+CFLAGS+= -fno-vectorize -DNINPUT=65536
+endif
+

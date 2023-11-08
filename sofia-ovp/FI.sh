@@ -512,7 +512,7 @@ function configureCommands {
                         CMD_OVP="$CMD_OVP --mode baremetal --variant $CPU_VARIANT --verbose -environment $ENVIRONMENT --arch singlecore "
 
                         # Flags to export to the Makefile
-                        export MAKEFILE_CFLAGS="-g -w -I$SUPPORT_FOLDER -I$OVP_FIM -D$ENVIRONMENT -DBAREMETAL -std=gnu99 -fcommon -O$OPTFLAG"
+                        export MAKEFILE_CFLAGS="-g -w -I$SUPPORT_FOLDER -I$OVP_FIM -D$ENVIRONMENT -DBAREMETAL -fcommon -O$OPTFLAG"
 
                         # Overrides specific by architecture
                         if [[ "$ARCHITECTURE" = 'ARM_CORTEX_M0' ]] || \
