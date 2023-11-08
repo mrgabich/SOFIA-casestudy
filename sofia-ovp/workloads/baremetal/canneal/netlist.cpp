@@ -168,7 +168,7 @@ netlist::netlist(const std::string& filename)
 	//create a chip of the right size
 	_elements.resize(_chip_size);
 	
-	cout << "locs created" << endl;
+	// cout << "locs created" << endl;
 	//create the location elements
 	vector<location_t> y_vec(_max_y); 
 	_locations.resize(_max_x, y_vec);
@@ -184,7 +184,7 @@ netlist::netlist(const std::string& filename)
 			i_elem++;
 		}//for (int y = 0; y < _max_y; y++)
 	}//for (int x = 0; x < _max_x; x++)
-	cout << "locs assigned" << endl;
+	// cout << "locs assigned" << endl;
 
 	int i=0;
 	while (!fin.eof()){
@@ -211,19 +211,11 @@ netlist::netlist(const std::string& filename)
 			netlist_elem* fanin_elem = create_elem_if_necessary(fanin_name);
 			present_elem->fanin.push_back(fanin_elem);
 			fanin_elem->fanout.push_back(present_elem);
-#ifdef USE_RISCV_VECTOR
-			unsigned long * fanin_location = (unsigned long *)&fanin_elem->present_loc;
-			present_elem->fan_locs.push_back(fanin_location);
-			unsigned long * fanout_location = (unsigned long *)&present_elem->present_loc;
-			fanin_elem->fan_locs.push_back(fanout_location);
-			//printf("fanin_elem->present_loc a 0x%x \n", fanin_location );
-			//printf("fanin_elem->present_loc a 0x%x \n", fanout_location );
-#endif
 
 		}//while (fin >> fanin_name)
 
 	}//while (!fin.eof())
-		cout << "netlist created. " << i-1 << " elements." << endl;		
+		// cout << "netlist created. " << i-1 << " elements." << endl;		
 }
 
 //*****************************************************************************************

@@ -1,8 +1,9 @@
-// netlist_elem.h
+// main.cpp
 //
-// Created by Daniel Schwartz-Narbonne on 14/04/07.
+// Created by Daniel Schwartz-Narbonne on 13/04/07.
+// Modified by Christian Bienia
 //
-// Copyright 2007 Princeton University
+// Copyright 2007-2008 Princeton University
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,36 +27,55 @@
 // OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
 
+#include <math.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#ifndef NETLIST_ELEM_H
-#define NETLIST_ELEM_H
+#include "annealer_types.h"
+#include "annealer_thread.h"
+#include "netlist.h"
+#include "rng.h"
+#include "FIM.h"
 
-#include <string>
-#include <vector>
-#include <deque>
+using namespace std;
+int num_threads = 0;
+int swaps_per_temp = 0;
+int start_temp = 0;
+int number_temp_steps = -1;
 
-#include "AtomicPtr.h"
-#include "location_t.h"
-#include "annealer_types.h" 
+void* entry_pt(void*);
 
-using threads::AtomicPtr;
+int main (int argc, char * const argv[]) {
 
-class netlist_elem{
-public:	
-	netlist_elem();
-	routing_cost_t routing_cost_given_loc(location_t loc);
-	routing_cost_t swap_cost(location_t* old_loc, location_t* new_loc);
+	srandom(3);
+	//argument 1 is numthreads
+	num_threads = 1;
+	//argument 2 is the num moves / temp
+	swaps_per_temp = 100;
+	//argument 3 is the start temp
+	start_temp =  300;
 	
-public:
-	std::string item_name;
-	std::vector<netlist_elem*> fanin;
-	std::vector<netlist_elem*> fanout;
-	AtomicPtr<location_t> present_loc;
-	//std::deque<location_t *> fan_locs;
-	std::vector<unsigned long *> fan_locs;
-protected:
-};
+	//argument 4 is the netlist filename
+	string filename("./input/100.nets");
+	//argument 5 (optional) is the number of temperature steps before termination
+	number_temp_steps = 8;
+
+	//now that we've read in the commandline, run the program
+	netlist my_netlist(filename);
+	
+    FIM_Instantiate();
+
+	annealer_thread a_thread(&my_netlist,num_threads,swaps_per_temp,start_temp,number_temp_steps);
 
 
-#endif
+	a_thread.Run();
 
+    FIM_exit();
+	return 0;
+}
+
+void* entry_pt(void* data)
+{
+	annealer_thread* ptr = static_cast<annealer_thread*>(data);
+	ptr->Run();
+}

@@ -33,10 +33,6 @@
 class location_t {
 public:
 
-// #ifdef PARSEC_USE_RISCV
-//   __attribute__((aligned (16))) float x_y[4];
-// #endif
-
 	int x;
 	int y;
 };

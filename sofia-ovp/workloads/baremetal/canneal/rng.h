@@ -32,23 +32,13 @@
 
 #include <vector>
 
-#ifdef ENABLE_THREADS
-#include <pthread.h>
-#endif
-
 #include "MersenneTwister.h"
 
 class Rng
 {
 public:
 	Rng() {
-#ifdef ENABLE_THREADS
-		pthread_mutex_lock(&seed_lock);
 		_rng = new MTRand(seed++);
-		pthread_mutex_unlock(&seed_lock);
-#else
-		_rng = new MTRand(seed++);
-#endif //ENABLE_THREADS
 	}
 	~Rng() {
 		delete _rng;

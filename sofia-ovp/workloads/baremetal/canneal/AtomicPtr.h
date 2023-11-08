@@ -96,12 +96,6 @@
 
 #include <cassert>
 
-#ifdef ENABLE_THREADS
-#include "atomic/atomic.h"
-#endif
-
-
-
 namespace threads {
 
 template <typename T>
@@ -122,15 +116,8 @@ class AtomicPtr {
     //helper function to set the pointer to a value (without any checks)
     inline T *PrivateSet(T *x) {
       T *val;
-
-#ifdef ENABLE_THREADS
-      do {
-        val = Get();
-      } while(!atomic_cmpset_ptr((ATOMIC_TYPE *)&p, (ATOMIC_TYPE)val, (ATOMIC_TYPE)x));
-#else
-        val = Get();
-        p = x;
-#endif //ENABLE_THREADS
+      val = Get();
+      p = x;
 
       return val;
     }
@@ -140,21 +127,10 @@ class AtomicPtr {
       T *val;
       bool rv;
 
-#ifdef ENABLE_THREADS
-      if(!TryGet(&val)) {
-        return false;
-      }
-      rv = atomic_cmpset_ptr((ATOMIC_TYPE *)&p, (ATOMIC_TYPE)val, (ATOMIC_TYPE)x);
-      if(rv && (y != NULL)) {
-        *y = val;
-      }
-      return rv;
-#else
       assert(p != ATOMIC_NULL);
       *y = p;
       p = x;
       return true;
-#endif //ENABLE_THREADS
     }
 
   public:
@@ -191,14 +167,8 @@ class AtomicPtr {
     inline T *Get() const {
       T *val;
 
-#ifdef ENABLE_THREADS
-      do {
-        val = (T *)atomic_load_acq_ptr((ATOMIC_TYPE *)&p);
-      } while(val == ATOMIC_NULL);
-#else
       val = p;
       assert(val != ATOMIC_NULL);
-#endif //ENABLE_THREADS
 
       return val;
     }
@@ -209,11 +179,7 @@ class AtomicPtr {
     inline bool TryGet(T **x) const {
       T *val;
 
-#ifdef ENABLE_THREADS
-      val = (T *)atomic_load_acq_ptr((ATOMIC_TYPE *)&p);
-#else
       val = p;
-#endif //ENABLE_THREADS
       if(val != ATOMIC_NULL) {
         *x = val;
         return true;
@@ -290,11 +256,7 @@ class AtomicPtr {
 
     //release an exclusive pointer (mutex unlock semantics)
     inline void Checkin(T *x) {
-#ifdef ENABLE_TRHEADS
-      atomic_store_rel_ptr((ATOMIC_TYPE *)(&p), (ATOMIC_TYPE)x);
-#else
       p = x;
-#endif //ENABLE_THREADS
     }
 
 
@@ -310,11 +272,7 @@ class AtomicPtr {
     }
 
     T *operator=(AtomicPtr<T> X) {
-#ifdef ENABLE_THREADS
-      T *val = (T *)atomic_load_acq_ptr((ATOMIC_TYPE *)&X.p);
-#else
       T * val = X.p;
-#endif //ENABLE_THREADS
       Set(val);
       return val;
     }

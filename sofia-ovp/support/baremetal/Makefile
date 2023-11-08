@@ -83,17 +83,17 @@ ifeq ($(wildcard *.cpp),)
 all: clean $(TARGET_LST) $(TARGET_HEX)
 
 %.o: %.c
-	@echo CCompiling $^
+	@echo Compiling $^
 	@mkdir -p $(dir $@)
 	$(V)$(IMPERAS_CC) -o $@ $(CFLAGS) -std=gnu99 -c $<
 
 $(TARGET): $(EXE)
-	@echo CLinking $@
+	@echo Linking $@
 	$(V)$(IMPERAS_LINK) -o $@ $(IMPERAS_LDFLAGS) -lm -lc -std=gnu99 $(CFLAGS) $(EXE)
 
 $(TARGET_LST): $(TARGET)
 	@echo DBG Application $@
-	$(V)$(IMPERAS_OBJDUMP) -D $< > $@
+	$(V)$(IMPERAS_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $< > $@
 
 $(TARGET_BIN): $(TARGET)
 	@echo Linking $@
@@ -107,17 +107,17 @@ ifeq ($(wildcard *.c),)
 all: clean $(TARGET_LST) $(TARGET_HEX)
 
 %.o: %.cpp
-	@echo PPCompiling $^
+	@echo Compiling $^
 	@mkdir -p $(dir $@)
 	$(V)$(IMPERAS_CXX) -o $@ $(CFLAGS) -c $<
 
 $(TARGET): $(EXEPP)
-	@echo CPPLinking $@
+	@echo Linking $@
 	$(V)$(IMPERAS_LINKXX) -o $@ $(IMPERAS_LDFLAGS) -lm -lc $(CFLAGS) $(EXEPP)
 
 $(TARGET_LST): $(TARGET)
 	@echo DBG Application $@
-	$(V)$(IMPERAS_OBJDUMP) -D $< > $@
+	$(V)$(IMPERAS_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $< > $@
 
 $(TARGET_BIN): $(TARGET)
 	@echo Linking $@

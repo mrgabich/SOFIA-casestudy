@@ -65,27 +65,15 @@ public:
 	_number_temp_steps(number_temp_steps)
 	{
 		assert(_netlist != NULL);
-#ifdef ENABLE_THREADS
-		pthread_barrier_init(&_barrier, NULL, nthreads);
-#endif
 	};
 	
 	~annealer_thread() {
-#ifdef ENABLE_THREADS
-		pthread_barrier_destroy(&_barrier);
-#endif
 	}					
 	void Run();
 					
 protected:
 	move_decision_t accept_move(routing_cost_t delta_cost, double T, Rng* rng);
-
-#ifdef USE_RISCV_VECTOR
-	routing_cost_t calculate_delta_routing_cost_vector(netlist_elem* a, netlist_elem* b/*,__epi_2xi1  xMask*/);
-#else // !USE_RISCV_VECTOR
 	routing_cost_t calculate_delta_routing_cost(netlist_elem* a, netlist_elem* b);
-#endif // !USE_RISCV_VECTOR
-
 	bool keep_going(int temp_steps_completed, int accepted_good_moves, int accepted_bad_moves);
 
 protected:
@@ -94,13 +82,7 @@ protected:
 	int _moves_per_thread_temp;
 	int _start_temp;
 	int _number_temp_steps;
-#ifdef USE_RISCV_VECTOR
-	int* mask;
-#endif // !USE_RISCV_VECTOR
 
-#ifdef ENABLE_THREADS
-	pthread_barrier_t _barrier;
-#endif
 };
 
 #endif

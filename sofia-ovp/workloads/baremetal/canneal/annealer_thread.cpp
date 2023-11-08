@@ -25,11 +25,6 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 // OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 // SUCH DAMAGE.
-
-#ifdef ENABLE_THREADS
-#include <pthread.h>
-#endif
-
 #include <cassert>
 #include "annealer_thread.h"
 #include "location_t.h"
@@ -44,11 +39,6 @@ using std::cout;
 using std::endl;
 
 #include <stdlib.h>
-
-// RISC-V VECTOR Version by Cristóbal Ramírez Lazo, "Barcelona 2019"
-#ifdef USE_RISCV_VECTOR
-#include "../../common/vector_defines.h"
-#endif
 
 //*****************************************************************************************
 //
@@ -67,31 +57,21 @@ void annealer_thread::Run()
 
     int temp_steps_completed=0;
 
-    #ifdef USE_RISCV_VECTOR
-    //unsigned long int gvl   = __builtin_epi_vsetvlmax(__epi_e32, __epi_m1);
-    unsigned long int gvl   = vsetvlmax_e32m1(); //PLCT
-    
-    mask = (int*)malloc(gvl*sizeof(int));
-    for(int i=0 ; i<=gvl ; i=i+2) { mask[i]=1;  mask[i+1]=0; }
-    #endif // !USE_RISCV_VECTOR
-
     while(keep_going(temp_steps_completed, accepted_good_moves, accepted_bad_moves)){
         T = T / 1.5;
         accepted_good_moves = 0;
         accepted_bad_moves = 0;
+        // cout << "TESTING"  << endl;
 
         for (int i = 0; i < _moves_per_thread_temp; i++){
             a = b;
             a_id = b_id;
             b = _netlist->get_random_element(&b_id, a_id, &rng);
-    #ifdef USE_RISCV_VECTOR
-            routing_cost_t delta_cost = calculate_delta_routing_cost_vector(a,b/*,xMask*/);
-    #else // !USE_RISCV_VECTOR
             routing_cost_t delta_cost = calculate_delta_routing_cost(a,b);
-    #endif // !USE_RISCV_VECTOR
 
             move_decision_t is_good_move = accept_move(delta_cost, T, &rng);
-
+            // cout << _netlist << endl;
+            // cout << b << endl;
             //make the move, and update stats:
             if (is_good_move == move_decision_accepted_bad){
                 accepted_bad_moves++;
@@ -105,13 +85,7 @@ void annealer_thread::Run()
         }
 
         temp_steps_completed++;
-#ifdef ENABLE_THREADS
-        pthread_barrier_wait(&_barrier);
-#endif
     }
-#ifdef USE_RISCV_VECTOR
-    free(mask);
-#endif // !USE_RISCV_VECTOR
 }
 
 //*****************************************************************************************
@@ -136,51 +110,6 @@ annealer_thread::move_decision_t annealer_thread::accept_move(routing_cost_t del
 //*****************************************************************************************
 //  If get turns out to be expensive, I can reduce the # by passing it into the swap cost fcn
 //*****************************************************************************************
-#ifdef USE_RISCV_VECTOR
-routing_cost_t annealer_thread::calculate_delta_routing_cost_vector(netlist_elem* a, netlist_elem* b/*, __epi_2xi1  xMask2*/)
-{
-    routing_cost_t delta_cost=0.0;
-
-    int a_fan_size = a->fanin.size() + a->fanout.size();
-    int b_fan_size = b->fanin.size() + b->fanout.size();
-    location_t* a_loc = a->present_loc.Get();
-    location_t* b_loc = b->present_loc.Get();
-
-
-    if((a_fan_size > 0) | (b_fan_size > 0))
-    {
-        int max_vl = (a_fan_size > b_fan_size) ? a_fan_size*2 : b_fan_size*2;
-        //unsigned long int gvl   = __builtin_epi_vsetvl(max_vl,__epi_e32, __epi_m1);
-        unsigned long int gvl = vsetvl_e32m1(max_vl); //PLCT
-
-        // Get the MVL allowed by the hardware
-        //unsigned long int gvl   = __builtin_epi_vsetvlmax(__epi_e32, __epi_m1);
-        //Create a mask with size of MVL
-        //int* mask;
-        //mask = (int*)malloc(gvl*sizeof(int));
-        //for(int i=0 ; i<=gvl ; i=i+2) { mask[i]=1;  mask[i+1]=0; }
-        
-        //__epi_2xi1  xMask = __builtin_epi_cast_2xi1_2xi32(_MM_LOAD_i32(mask,gvl));
-        _MMR_MASK_i32 xMask =  _MM_CAST_i1_i32(_MM_LOAD_i32(mask,gvl), gvl); //PLCT
-        
-        _MMR_i32 xAFanin_loc     = _MM_MERGE_i32(_MM_SET_i32(a_loc->y,gvl),_MM_SET_i32(a_loc->x,gvl),xMask,gvl);
-        _MMR_i32 xBFanin_loc     = _MM_MERGE_i32(_MM_SET_i32(b_loc->y,gvl),_MM_SET_i32(b_loc->x,gvl),xMask,gvl);
-
-        if(a_fan_size > 0) {
-            delta_cost = a->swap_cost_vector(xAFanin_loc,xBFanin_loc,a_fan_size);
-        }
-        if(b_fan_size > 0) {
-            delta_cost = delta_cost + b->swap_cost_vector(xBFanin_loc,xAFanin_loc,b_fan_size);
-        }
-    }
-
-    return delta_cost;
-}
-
-#else // !USE_RISCV_VECTOR
-//*****************************************************************************************
-//  If get turns out to be expensive, I can reduce the # by passing it into the swap cost fcn
-//*****************************************************************************************
 routing_cost_t annealer_thread::calculate_delta_routing_cost(netlist_elem* a, netlist_elem* b)
 {
     routing_cost_t delta_cost=0.0;
@@ -193,7 +122,6 @@ routing_cost_t annealer_thread::calculate_delta_routing_cost(netlist_elem* a, ne
 
     return delta_cost;
 }
-#endif // !USE_RISCV_VECTOR
 //*****************************************************************************************
 //  Check whether design has converged or maximum number of steps has reached
 //*****************************************************************************************
