@@ -27,17 +27,18 @@
  * arrays and simple arithmetic.
  */
 
-#define UPPERLIMIT 128
+#define UPPERLIMIT 256
 
 #include "FIM.h"
 
-#ifndef VPREC
-#define VPREC int
+
+#ifndef OP_PRECISION
+#define OP_PRECISION int
 #endif
 
-typedef VPREC matrix [UPPERLIMIT][UPPERLIMIT];
+typedef OP_PRECISION matrix [UPPERLIMIT][UPPERLIMIT];
 
-VPREC Seed;
+OP_PRECISION Seed;
 matrix ArrayA, ArrayB, ResultArray;
 
 
@@ -46,7 +47,7 @@ void Multiply(matrix A, matrix B, matrix Res);
 void InitSeed(void);
 void Test(matrix A, matrix B, matrix Res);
 void Initialize(matrix Array);
-VPREC RandomInteger(void);
+OP_PRECISION RandomInteger(void);
 
 
 void main()
@@ -100,7 +101,7 @@ void Initialize(matrix Array)
 }
 
 
-VPREC RandomInteger(void)
+OP_PRECISION RandomInteger(void)
 /*
  * Generates random integers between 0 and 8095
  */
@@ -115,7 +116,7 @@ void Multiply(matrix A, matrix B, matrix Res)
  * Multiplies arrays A and B and stores the result in ResultArray.
  */
 {
-   int Outer, Inner, Index;
+   register int Outer, Inner, Index;
 
    for (Outer = 0; Outer < UPPERLIMIT; Outer++)
       for (Inner = 0; Inner < UPPERLIMIT; Inner++)
@@ -126,4 +127,3 @@ void Multiply(matrix A, matrix B, matrix Res)
                A[Outer][Index] * B[Index][Inner];
        }
 }
-

@@ -211,9 +211,9 @@ IMPERAS_VERSION=20230524
 Cross Compiler configuration
 '
 # Compiler optimization flag
-export OPTFLAG=2
+export OPTFLAG=3
 # Compiler type: llvm or gcc
-export CC_TYPE="GCC"
+export CC_TYPE="LLVM"
 #Target Simulator PATH
 export SIMULATOR_PATH=/home/${USER}/
 # Cross Compiler PATH
