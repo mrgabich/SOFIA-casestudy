@@ -249,7 +249,7 @@ class faultGenerator:
                             for x in range(shift, shift+numFlips): 
                                 shiftValues.append(x)
                         else:
-                            shiftValues = sample(range(0,(self.options.vecbw-1)), numFlips)
+                            shiftValues = sample(range(0,(archregisters.busWidth-1)), numFlips)
                         for j in shiftValues:
                             masks.append(ctypes.c_uint64(~(0x1 << j)))
                         faultMask = masks[0]
