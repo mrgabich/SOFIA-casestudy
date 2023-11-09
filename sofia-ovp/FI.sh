@@ -464,32 +464,32 @@ function configureCommands {
                 WORKLOAD_BAREMETAL)
                         # Baremetal Applications, ignore the multi-core factor
                         case "$ARCHITECTURE" in
-                                ARM_CORTEX_A5) CPU_VARIANT=Cortex-A5UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_A7) CPU_VARIANT=Cortex-A7UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_A8) CPU_VARIANT=Cortex-A8; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_A9) CPU_VARIANT=Cortex-A9UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_A15) CPU_VARIANT=Cortex-A15UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M0) CPU_VARIANT=Cortex-M0; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M0PLUS) CPU_VARIANT=Cortex-M0plus; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M3) CPU_VARIANT=Cortex-M3; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M4) CPU_VARIANT=Cortex-M4; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M4F) CPU_VARIANT=Cortex-M4F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                ARM_CORTEX_M7) CPU_VARIANT=Cortex-M7; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M7F) CPU_VARIANT=Cortex-M7F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                ARM_CORTEX_M33) CPU_VARIANT=Cortex-M33; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
-                                ARM_CORTEX_M33F) CPU_VARIANT=Cortex-M33F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAnge; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                RISCV32GC) CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32GCV) CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32I) CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32IM) CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV32IMAC) CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64IMAC) CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64GC) CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64GCV) CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                SIFIVEX280) CPU_VARIANT=X280; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=sifive.ovpworld.org;;
+                                ARM_CORTEX_A5) export CPU_VARIANT=Cortex-A5UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A7) export CPU_VARIANT=Cortex-A7UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A8) export CPU_VARIANT=Cortex-A8; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A9) export CPU_VARIANT=Cortex-A9UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A15) export CPU_VARIANT=Cortex-A15UP; export armType=arm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_M0) export CPU_VARIANT=Cortex-M0; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M0PLUS) export CPU_VARIANT=Cortex-M0plus; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M3) export CPU_VARIANT=Cortex-M3; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M4) export CPU_VARIANT=Cortex-M4; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M4F) export CPU_VARIANT=Cortex-M4F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_M7) export CPU_VARIANT=Cortex-M7; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M7F) export CPU_VARIANT=Cortex-M7F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_M33) export CPU_VARIANT=Cortex-M33; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib;;
+                                ARM_CORTEX_M33F) export CPU_VARIANT=Cortex-M33F; export armType=armm; export ENVIRONMENT=ovparmv7; export armSemihost=armNewlib; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAnge; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                RISCV32GC) export CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1";;
+                                RISCV32GCV) export CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
+                                RISCV32I) export CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32IM) export CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV32IMAC) export CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64IMAC) export CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
+                                RISCV64GC) export CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1";;
+                                RISCV64GCV) export CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
+                                SIFIVEX280) export CPU_VARIANT=X280; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=sifive.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
                                 *) echo "Invalid architecture"; exit ;;
                         esac
 
@@ -566,8 +566,8 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --mode linux --startaddress 0x60000000 --arch multicore"
 
                                         case "$ARCHITECTURE" in
-                                                ARM_CORTEX_A9) CPU_VARIANT=Cortex-A9MPx$NUM_CORES; MPUFLAG="cortex-a9";;
-                                                ARM_CORTEX_A7) CPU_VARIANT=Cortex-A7MPx$NUM_CORES; MPUFLAG="cortex-a7";;
+                                                ARM_CORTEX_A9) export CPU_VARIANT=Cortex-A9MPx$NUM_CORES; MPUFLAG="cortex-a9";;
+                                                ARM_CORTEX_A7) export CPU_VARIANT=Cortex-A7MPx$NUM_CORES; MPUFLAG="cortex-a7";;
                                         esac
 
                                         # Define the workload path
@@ -621,9 +621,9 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --mode linux64 --linuxdtb $LINUX_DTB --startaddress 0x80000000 --arch multicore"
 
                                         case "$ARCHITECTURE" in
-                                                ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
-                                                ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
-                                                ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
+                                                ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
+                                                ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
+                                                ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
                                         esac
 
                                         # Define the workload path
@@ -666,8 +666,8 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --mode linux64 --program $LINUX_KERNEL_AXF --arch bigLITTLE"
 
                                         case "$ARCHITECTURE" in
-                                                ARM_V8_BL_2_2) CPU_VARIANT=MultiCluster; NUM_CORES=4 ;MPUFLAG="cortex-a57.cortex-a53"; CMD_OVP+=" --override FIM/DUT0/cpu/override_clusterVariants=Cortex-A57MPx2,Cortex-A53MPx2";;
-                                                ARM_V8_BL_2_4) CPU_VARIANT=MultiCluster; NUM_CORES=4 ;MPUFLAG="cortex-a57.cortex-a53"; CMD_OVP+=" --override FIM/DUT0/cpu/override_clusterVariants=Cortex-A57MPx2,Cortex-A53MPx4";;
+                                                ARM_V8_BL_2_2) export CPU_VARIANT=MultiCluster; NUM_CORES=4 ;MPUFLAG="cortex-a57.cortex-a53"; CMD_OVP+=" --override FIM/DUT0/cpu/override_clusterVariants=Cortex-A57MPx2,Cortex-A53MPx2";;
+                                                ARM_V8_BL_2_4) export CPU_VARIANT=MultiCluster; NUM_CORES=4 ;MPUFLAG="cortex-a57.cortex-a53"; CMD_OVP+=" --override FIM/DUT0/cpu/override_clusterVariants=Cortex-A57MPx2,Cortex-A53MPx4";;
                                         esac
 
                                         # Define the workload path
@@ -713,8 +713,8 @@ function configureCommands {
                                         # CMD_OVP="$CMD_OVP --mode linux64 --linuxdtb $LINUX_DTB --startaddress 0x80000000 --arch multicore"
 
                                         # case "$ARCHITECTURE" in
-                                        #         RV64GC) CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
-                                        #         RV64GCV) CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
+                                        #         RV64GC) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
+                                        #         RV64GCV) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
                                         # esac
 
                                         # # Define the workload path

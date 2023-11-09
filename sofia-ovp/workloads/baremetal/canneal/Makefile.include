@@ -1,5 +1,11 @@
+#INPUT OPTIONS
+#argument 1 is numthreads
+#argument 2 is the num moves / temp
+#argument 3 is the start temp
+#argument 4 10.nets 100.nets 100000.nets 200000.nets 2500000.nets
+#argument 5 (optional) is the number of temperature steps before termination
 ifeq ($(CC_TYPE),GCC)
-CFLAGS+= -fno-tree-vectorize -DNINPUT=256
+CFLAGS+= -fno-tree-vectorize -DNUMTHREADS=1 -DSWAPSPERTEMPERATURE=100 -DSTARTTEMPERATURE=300 -DMINTEMPERATURESTEPS=8 -DINPUTFILE="\"./input/200000.nets\""
 else
-CFLAGS+= -fno-vectorize -DNINPUT=256
+CFLAGS+= -fno-vectorize -DNUMTHREADS=1 -DSWAPSPERTEMPERATURE=100 -DSTARTTEMPERATURE=300 -DMINTEMPERATURESTEPS=8 -DINPUTFILE="\"./input/200000.nets\""
 endif

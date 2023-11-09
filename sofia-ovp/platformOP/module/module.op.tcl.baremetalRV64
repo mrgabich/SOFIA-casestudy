@@ -30,19 +30,30 @@ for {set i 0} {$i < 1} {incr i} {
     ihwaddprocessor -instancename cpu${i} -type $::env(armType) -vendor $vendor -version $version -endian little -semihostname $::env(armSemihost) -mips 1000.0
 
     #Main Bus
-    ihwaddbus       -instancename mainBus${i}   -addresswidth 63
+    if {("$::env(CPU_VARIANT)" == "RV64IMAC") || ("$::env(CPU_VARIANT)" == "RV64GC") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
+        ihwaddbus       -instancename mainBus${i}   -addresswidth 48
+    } else {
+        ihwaddbus       -instancename mainBus${i}   -addresswidth 32
+    }
     
     #Connections --> MPx cores
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport INSTRUCTION
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
+    ihwsetparameter -handle cpu${i} -name variant -value $::env(CPU_VARIANT) -type enum
     # Override default value of mstatus.FS to 1: Enable FPU
-    ihwsetparameter -handle cpu${i} -name mstatus_FS -type Uns32 -value 1
+    if {("$::env(CPU_VARIANT)" == "RV32GC") || ("$::env(CPU_VARIANT)" == "RV64GC") || ("$::env(CPU_VARIANT)" == "RV32GCV") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
+        ihwsetparameter -handle cpu${i} -name mstatus_FS -type Uns32 -value 1
+    }
     # Override default value of mstatus.VS to 1: Enable VE
-    ihwsetparameter -handle cpu${i} -name mstatus_VS -type Uns32 -value 1
-
+    if {("$::env(CPU_VARIANT)" == "RV32GCV") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
+        ihwsetparameter -handle cpu${i} -name mstatus_VS -type Uns32 -value 1
+    }
     #RAM
     ihwaddmemory -instancename ram${i} -type ram
-    ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0x7fffffffffffffff
-
+    if {("$::env(CPU_VARIANT)" == "RV64IMAC") || ("$::env(CPU_VARIANT)" == "RV64GC") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
+        ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffffffff
+    } else {
+        ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffff
+    }
 
 }

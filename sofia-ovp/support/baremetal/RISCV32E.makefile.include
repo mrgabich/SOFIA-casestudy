@@ -6,4 +6,4 @@ RISCV32E_CFLAGS = -march=rv32e -mabi=ilp32e
 RISCV32E_TL        = riscv32-elf
 RISCV32E_TL_SUBDIR =
 
-include $(BAREMETAL_FOLDER)/RISCV.makefile.include
+include $(BAREMETAL_FOLDER)/RISCV32.makefile.include

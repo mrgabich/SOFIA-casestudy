@@ -49,21 +49,21 @@ int main (int argc, char * const argv[]) {
 
 	srandom(3);
 	//argument 1 is numthreads
-	num_threads = 1;
+	num_threads = NUMTHREADS;
 	//argument 2 is the num moves / temp
-	swaps_per_temp = 100;
+	swaps_per_temp = SWAPSPERTEMPERATURE;
 	//argument 3 is the start temp
-	start_temp =  300;
+	start_temp =  STARTTEMPERATURE;
 	
 	//argument 4 is the netlist filename
-	string filename("./input/100.nets");
+	string filename(INPUTFILE);
 	//argument 5 (optional) is the number of temperature steps before termination
-	number_temp_steps = 8;
+	number_temp_steps = MINTEMPERATURESTEPS;
+    FIM_Instantiate();
 
 	//now that we've read in the commandline, run the program
 	netlist my_netlist(filename);
 	
-    FIM_Instantiate();
 
 	annealer_thread a_thread(&my_netlist,num_threads,swaps_per_temp,start_temp,number_temp_steps);
 

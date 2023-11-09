@@ -7,4 +7,4 @@ RISCV32GC_CFLAGS    = -mabi=ilp32f -march=rv32gc
 RISCV32GC_TL        = riscv32f-elf
 RISCV32GC_TL_SUBDIR = 
 
-include $(BAREMETAL_FOLDER)/RISCV.makefile.include
+include $(BAREMETAL_FOLDER)/RISCV32.makefile.include

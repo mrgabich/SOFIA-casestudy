@@ -36,7 +36,7 @@ for {set i 0} {$i < 1} {incr i} {
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport INSTRUCTION
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
     # Override default value of enableVFPAtReset to 1: Enable FPU
-    ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
+    # ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
     
     #RAM
     ihwaddmemory -instancename ram${i} -type ram
