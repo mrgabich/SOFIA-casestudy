@@ -27,7 +27,7 @@ ihwnew -name $name -stoponctrlc
 
 for {set i 0} {$i < 1} {incr i} {
     #Processor
-    ihwaddprocessor -instancename cpu${i} -type $::env(armType) -vendor $vendor -version $version -endian little -semihostname $::env(armSemihost) -mips 1000.0
+    ihwaddprocessor -instancename cpu${i} -type $::env(armType) -vendor $vendor -version $version -endian little -semihostname $::env(armSemihost) -mips 100.0
 
     #Main Bus
     if {("$::env(CPU_VARIANT)" == "RV64IMAC") || ("$::env(CPU_VARIANT)" == "RV64GC") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {

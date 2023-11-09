@@ -418,7 +418,7 @@ void loadFaults() {
         /// extract the info
         sscanf(tempString,"%d %s %s %d "FMT_64u":%d %s \n",&PE.faultIdentifier,PE.faultTypeStr,PE.faultTarget,&PE.faultRegisterPosition,&PE.faultInsertionTime,&core,PE.vecFaultValue);
         // opPrintf("INFO: %s\n",PE.vecFaultValue);
-        PE.faultValue = atoi(PE.vecFaultValue);
+        PE.faultValue = atol(PE.vecFaultValue);
         /// core to inject
         PE.coreToInject=PE.childrens[core];
         PE.faultDuration = 1; // @Review
@@ -1048,7 +1048,7 @@ void handlerFaultInjection(Uns32 processorNumber) {
     Uns64 memAddress;
     Uns8  memValue;
     // Uns64 regTemp=0x0;
-    char vecRegTemp[MAX_VECTOR_REG_WIDTH];
+    char * vecRegTemp;
 
     switch(PE.status) {
     case BEFORE_INJECTION: { /// inject the fault
@@ -1087,21 +1087,29 @@ void handlerFaultInjection(Uns32 processorNumber) {
         if(MACRO_FAULTTYPE(TYPE_REGISTER) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE2)) { //Register faults
             // if (!strcmp(PE.faultRegister, "v0")){
                 // Acquire the register
+                vecRegTemp = malloc(sizeof(char) * (strlen(PE.vecFaultValue)/2));
                 opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
-                // opPrintf("Reg %s Value "FMT_64x" before %s \n",PE.faultRegister,PE.faultValue, vecRegTemp);
+                // opPrintf("Reg %s Value %ld before %s \n",PE.faultRegister,strlen(PE.vecFaultValue), vecRegTemp);
                 // Apply the mask
-                for (int i=0;i<MAX_VECTOR_REG_WIDTH;i+=8){
-                    vecRegTemp[i]= ~(vecRegTemp[i] ^ PE.vecFaultValue[i]);
-                    vecRegTemp[i+1]= ~(vecRegTemp[i+1] ^ PE.vecFaultValue[i+1]);
-                    vecRegTemp[i+2]= ~(vecRegTemp[i+2] ^ PE.vecFaultValue[i+2]);
-                    vecRegTemp[i+3]= ~(vecRegTemp[i+3] ^ PE.vecFaultValue[i+3]);
-                    vecRegTemp[i+4]= ~(vecRegTemp[i+4] ^ PE.vecFaultValue[i+4]);
-                    vecRegTemp[i+5]= ~(vecRegTemp[i+5] ^ PE.vecFaultValue[i+5]);
-                    vecRegTemp[i+6]= ~(vecRegTemp[i+6] ^ PE.vecFaultValue[i+6]);
-                    vecRegTemp[i+7]= ~(vecRegTemp[i+7] ^ PE.vecFaultValue[i+7]);
+                char hexPairFault[3] = "00";
+                char hexPairReg[3] = "00";
+                uint8_t base, fault;
+                for (int i=0;i<strlen(PE.vecFaultValue);i+=2){
+                    strncpy(hexPairFault, PE.vecFaultValue + i, 2);
+                    hexPairFault[2] = '\0';
+                    strncpy(hexPairReg, vecRegTemp + (i/2), 1);
+                    hexPairReg[2] = '\0';
+                    base = (uint8_t)(strtol(hexPairReg, NULL, 16));
+                    fault = (uint8_t)(strtol(hexPairFault, NULL, 16));
+                    // opPrintf("Base %d Fault %d ",base,fault);
+                    base = ~(base ^ fault);
+                    // opPrintf("Result %d \n",base);
+                    vecRegTemp[i/2] = (char) base;
                 }
+                // opPrintf("Reg %s Value "FMT_64x" DADO %s \n",PE.faultRegister,PE.faultValue,vecRegTemp);
                 // Writeback register
-                 opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
+                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
+                free(vecRegTemp);
                 //~ opPrintf(" after "FMT_64x" \n",regTemp);
         }else if ( MACRO_FAULTTYPE(TYPE_MEMORY2) || MACRO_FAULTTYPE(TYPE_VARIABLE2) || MACRO_FAULTTYPE(TYPE_FUNCTIONCODE) ){ // Virtual Memory faults
             // Acquire the address
