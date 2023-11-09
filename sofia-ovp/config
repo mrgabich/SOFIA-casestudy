@@ -30,7 +30,7 @@ VECTOR_REG_BITWIDTH=512
 : '
 Number of NUMBER_OF_FAULTS that equals to the number of injected faults
 '
-NUMBER_OF_FAULTS=17000
+NUMBER_OF_FAULTS=3000
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
@@ -91,7 +91,7 @@ MEMORY_OPTIONS=
 Output data structure harvesting
 Output data type size in bits
 '
-OUTPUTDATA=""
+OUTPUTDATA="ResultArray"
 OUTPUTDATA_SIZE=32
 OUTPUTDATA_OFFSET=0
 
@@ -147,7 +147,7 @@ LI_OPTIONS=LI_USE_CLEAN
 : '
 Execute only gold simulation
 '
-ONLY_GOLD=1
+ONLY_GOLD=0
 
 
 : '

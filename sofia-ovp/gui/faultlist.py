@@ -350,7 +350,9 @@ class faultGenerator:
                 index="0"
                 target=randint(self.options.memlowaddress,self.options.memhighaddress)
                 #Addressable memory range
-                if self.options.environment==environmentsE.ovparmv8.name or self.options.environment==environmentsE.gem5armv8.name:
+                if self.options.environment==environmentsE.ovparmv8.name \
+                    or self.options.environment==environmentsE.gem5armv8.name \
+                    or self.options.environment==environmentsE.riscv64.name:
                     target="%016X"%(randint(self.options.memlowaddress,self.options.memhighaddress))
                 else:
                     target="%08X"%(randint(self.options.memlowaddress,self.options.memhighaddress))
@@ -360,8 +362,13 @@ class faultGenerator:
                     faultMask = ctypes.c_uint8(0xFF)                     # no effect
                 else:
                     faultMask = ctypes.c_uint8(~(0x1<< randint(0,7)))    # random mask of one bit between zero and 31 ones
-            if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
-                fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask))
+            if self.options.environment==environmentsE.ovparmv8.name \
+                or self.options.environment==environmentsE.gem5armv8.name \
+                or self.options.environment==environmentsE.riscv64.name:
+                if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                    fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.upper()))
+                else:
+                    fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
             else:
                 fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
         fileptr.close()
