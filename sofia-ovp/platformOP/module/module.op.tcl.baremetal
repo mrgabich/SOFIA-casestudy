@@ -30,17 +30,33 @@ for {set i 0} {$i < 1} {incr i} {
     ihwaddprocessor -instancename cpu${i} -type $::env(armType) -vendor $vendor -version $version -endian little -semihostname $::env(armSemihost) -mips 100.0
 
     #Main Bus
-    ihwaddbus       -instancename mainBus${i}   -addresswidth 32
+    if {("$::env(CPU_VARIANT)" == "Cortex-A53MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A57MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A72MPx1")} {
+        ihwaddbus       -instancename mainBus${i}   -addresswidth 48
+    } else {
+        ihwaddbus       -instancename mainBus${i}   -addresswidth 32
+    }
     
     #Connections --> MPx cores
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport INSTRUCTION
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
+    ihwsetparameter -handle cpu${i} -name variant -value $::env(CPU_VARIANT) -type enum
     # Override default value of enableVFPAtReset to 1: Enable FPU
-    # ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
+    if {("$::env(CPU_VARIANT)" == "Cortex-A5UP") || ("$::env(CPU_VARIANT)" == "Cortex-A7UP") || 
+        ("$::env(CPU_VARIANT)" == "Cortex-A8") || ("$::env(CPU_VARIANT)" == "Cortex-A9UP") || 
+        ("$::env(CPU_VARIANT)" == "Cortex-A15UP") || ("$::env(CPU_VARIANT)" == "Cortex-M4F") || 
+        ("$::env(CPU_VARIANT)" == "Cortex-M7F") || ("$::env(CPU_VARIANT)" == "Cortex-M33F") || 
+        ("$::env(CPU_VARIANT)" == "Cortex-A53MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A57MPx1") || 
+        ("$::env(CPU_VARIANT)" == "Cortex-A72MPx1")} {
+        ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
+    }
     
     #RAM
     ihwaddmemory -instancename ram${i} -type ram
-    ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffff
+    if {("$::env(CPU_VARIANT)" == "Cortex-A53MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A57MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A72MPx1")} {
+        ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffffffff
+    } else {
+        ihwconnect -bus mainBus${i} -instancename ram${i} -busslaveport sp1 -loaddress 0x0 -hiaddress 0xffffffff
+    }
 
 
 }

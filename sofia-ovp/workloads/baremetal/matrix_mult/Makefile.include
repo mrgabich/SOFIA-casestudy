@@ -1,1 +1,5 @@
-CFLAGS+= -fno-vectorize
+ifeq ($(CC_TYPE),GCC)
+CFLAGS+= -fno-tree-vectorize -DUPPERLIMIT=256
+else
+CFLAGS+= -fno-vectorize -DUPPERLIMIT=256
+endif

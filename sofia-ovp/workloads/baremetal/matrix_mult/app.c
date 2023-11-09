@@ -27,7 +27,7 @@
  * arrays and simple arithmetic.
  */
 
-#define UPPERLIMIT 256
+// #define UPPERLIMIT 256
 
 #include "FIM.h"
 
