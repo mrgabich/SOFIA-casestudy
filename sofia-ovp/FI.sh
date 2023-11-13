@@ -481,15 +481,16 @@ function configureCommands {
                                 ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
                                 ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAnge; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
                                 ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx1; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
-                                RISCV32GC) export CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1";;
-                                RISCV32GCV) export CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
+                                AARCH64) export CPU_VARIANT=AArch64; export armType=arm; export ENVIRONMENT=ovparmv8; export armSemihost=armAngel; CMD_OVP="$CMD_OVP --override enableVFPAtReset=on";;
+                                RISCV32GC) export CPU_VARIANT=RV32GC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1 --override Zfh=on";;
+                                RISCV32GCV) export CPU_VARIANT=RV32GCV; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1 --override mstatus_VS=1 --override Zfh=on --override Zvfh=on";;
                                 RISCV32I) export CPU_VARIANT=RV32I; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV32IM) export CPU_VARIANT=RV32IM; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV32IMAC) export CPU_VARIANT=RV32IMAC; export ENVIRONMENT=riscv32; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
                                 RISCV64IMAC) export CPU_VARIANT=RV64IMAC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org;;
-                                RISCV64GC) export CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1";;
-                                RISCV64GCV) export CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
-                                SIFIVEX280) export CPU_VARIANT=X280; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=sifive.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1"; CMD_OVP="$CMD_OVP --override mstatus_VS=1";;
+                                RISCV64GC) export CPU_VARIANT=RV64GC; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1 --override Zfh=on";;
+                                RISCV64GCV) export CPU_VARIANT=RV64GCV; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=riscv.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1 --override mstatus_VS=1 --override Zfh=on --override Zvfh=on";;
+                                SIFIVEX280) export CPU_VARIANT=X280; export ENVIRONMENT=riscv64; export armType=riscv; export armSemihost=pk; export vendor=sifive.ovpworld.org; CMD_OVP="$CMD_OVP --override mstatus_FS=1 --override mstatus_VS=1 --override Zfh=on --override Zvfh=on";;
                                 *) echo "Invalid architecture"; exit ;;
                         esac
 
