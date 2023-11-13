@@ -245,7 +245,10 @@ void initProcessorInstFIM(Uns32 processorNumber) {
     PE.applicationEnd   = (Uns64*)         calloc (MACRO_NUMBER_OF_CORES,sizeof(Uns64));
 
     if(MACRO_BAREMETAL_MODE_FLAG) { // !!!! Only valid to one core processor
-        if(!strcmp(options.environment,"ovparmv7") || !strcmp(options.environment,"riscv32") || !strcmp(options.environment,"riscv64"))
+        if((!strcmp(options.environment,"ovparmv7") || 
+            !strcmp(options.environment,"riscv32") || 
+            !strcmp(options.environment,"riscv64")) && 
+            strcmp(opProcessorVariant(PE.processorObj),"X280"))
             PE.childrens[0]=PE.processorObj;
         else //Using the multicore for baremetal armv8
             PE.childrens[0]=opProcessorChild(PE.processorObj);
@@ -1078,39 +1081,29 @@ void handlerFaultInjection(Uns32 processorNumber) {
             PE.status = WAIT_HANG;
         }
 
-        //~ for(int i=0;i<numberOfRegistersToCompare;i++) {
-            //~ opProcessorRegReadByName(PE.coreToInject,possibleRegisters[i],&regTemp);
-            //~ opPrintf("Value %s "FMT_64x" \n",possibleRegisters[i],regTemp);
-        //~ }
-
         /// insert the fault
         if(MACRO_FAULTTYPE(TYPE_REGISTER) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE2)) { //Register faults
-            // if (!strcmp(PE.faultRegister, "v0")){
-                // Acquire the register
-                vecRegTemp = malloc(sizeof(char) * (strlen(PE.vecFaultValue)/2));
-                opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
-                // opPrintf("Reg %s Value %ld before %s \n",PE.faultRegister,strlen(PE.vecFaultValue), vecRegTemp);
-                // Apply the mask
-                char hexPairFault[3] = "00";
-                char hexPairReg[3] = "00";
-                uint8_t base, fault;
-                for (int i=0;i<strlen(PE.vecFaultValue);i+=2){
-                    strncpy(hexPairFault, PE.vecFaultValue + i, 2);
-                    hexPairFault[2] = '\0';
-                    strncpy(hexPairReg, vecRegTemp + (i/2), 1);
-                    hexPairReg[2] = '\0';
-                    base = (uint8_t)(strtol(hexPairReg, NULL, 16));
-                    fault = (uint8_t)(strtol(hexPairFault, NULL, 16));
-                    // opPrintf("Base %d Fault %d ",base,fault);
-                    base = ~(base ^ fault);
-                    // opPrintf("Result %d \n",base);
-                    vecRegTemp[i/2] = (char) base;
-                }
-                // opPrintf("Reg %s Value "FMT_64x" DADO %s \n",PE.faultRegister,PE.faultValue,vecRegTemp);
-                // Writeback register
-                opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
-                free(vecRegTemp);
-                //~ opPrintf(" after "FMT_64x" \n",regTemp);
+            // Acquire the register
+            vecRegTemp = malloc(sizeof(char) * (strlen(PE.vecFaultValue)/2));
+            opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
+            // Apply the mask
+            char hexPairFault[3] = "00";
+            char hexPairReg[3] = "00";
+            uint8_t base, fault;
+            for (int i=0;i<strlen(PE.vecFaultValue);i+=2){
+                strncpy(hexPairFault, PE.vecFaultValue + i, 2);
+                hexPairFault[2] = '\0';
+                strncpy(hexPairReg, vecRegTemp + (i/2), 1);
+                hexPairReg[2] = '\0';
+                base = (uint8_t)(strtol(hexPairReg, NULL, 16));
+                fault = (uint8_t)(strtol(hexPairFault, NULL, 16));
+                base = ~(base ^ fault);
+                vecRegTemp[i/2] = (char) base;
+            }
+            // Writeback register
+            opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
+            free(vecRegTemp);
+            //~ opPrintf(" after "FMT_64x" \n",regTemp);
         }else if ( MACRO_FAULTTYPE(TYPE_MEMORY2) || MACRO_FAULTTYPE(TYPE_VARIABLE2) || MACRO_FAULTTYPE(TYPE_FUNCTIONCODE) ){ // Virtual Memory faults
             // Acquire the address
             sscanf(PE.faultTarget,"%lX",&memAddress);
@@ -1160,11 +1153,11 @@ void handlerFaultInjection(Uns32 processorNumber) {
             sprintf(tempString,"cmp %s %s ",chckName,dumpName);
             strcpy(cmpReturn,"Null");
             filePointer = popen(tempString, "r");
-            if( fgets(cmpReturn,STRING_SIZE,filePointer) != NULL ) opMessage("I",PREFIX_FIM,"Command execution error\n");
+            if( fgets(cmpReturn,STRING_SIZE,filePointer) != NULL ) opMessage("I",PREFIX_FIM,"CMP_Command execution error\n");
 
             /// remove Dump file to reduce the HD footprint
             sprintf(tempString,"rm %s",dumpName);
-            if( system(tempString) ) opMessage("I",PREFIX_FIM,"Command execution error (%s)\n",tempString);
+            if( system(tempString) ) opMessage("I",PREFIX_FIM,"RM_Command execution error (%s)\n",tempString);
 
             //~ printf("Comparing if the fault was masked \n");
             //~ printf("REG %s \n",tempString);
@@ -1185,11 +1178,11 @@ void handlerFaultInjection(Uns32 processorNumber) {
             sprintf(tempString,"cmp %s %s ",chckName,dumpName);
             strcpy(cmpReturn,"Null");
             filePointer = popen(tempString, "r");
-            if( fgets(cmpReturn,STRING_SIZE,filePointer) != NULL ) opMessage("I",PREFIX_FIM,"Command execution error\n");
+            if( fgets(cmpReturn,STRING_SIZE,filePointer) != NULL ) opMessage("I",PREFIX_FIM,"CMP_Command execution error\n");
 
             /// remove Dump file to reduce the HD footprint
             sprintf(tempString,"rm %s",dumpName);
-            if( !system(tempString) ) opMessage("I",PREFIX_FIM,"Command execution error\n");
+            if( !system(tempString) ) opMessage("I",PREFIX_FIM,"RM_Command execution error\n");
 
             /// compare the popen return with the previous state, if its equal means that the files are equal (i.e. the cmp command didn't return anything)
             if(strcmp(cmpReturn,"Null")==0)
