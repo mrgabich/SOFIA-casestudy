@@ -1,5 +1,5 @@
 ifeq ($(CC_TYPE),GCC)
-CFLAGS+= -fno-tree-vectorize -DUPPERLIMIT=256
+CFLAGS+= -fno-tree-vectorize -DUPPERLIMIT=512
 else
-CFLAGS+= -fno-vectorize -DUPPERLIMIT=256
+CFLAGS+= -fno-vectorize -DUPPERLIMIT=512
 endif

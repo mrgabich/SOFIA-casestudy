@@ -41,12 +41,17 @@ for {set i 0} {$i < 1} {incr i} {
     ihwconnect -bus mainBus${i} -instancename cpu${i} -busmasterport DATA
     ihwsetparameter -handle cpu${i} -name variant -value $::env(CPU_VARIANT) -type enum
     # Override default value of mstatus.FS to 1: Enable FPU
+    # Also enables half precision FP
     if {("$::env(CPU_VARIANT)" == "RV32GC") || ("$::env(CPU_VARIANT)" == "RV64GC") || ("$::env(CPU_VARIANT)" == "RV32GCV") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
         ihwsetparameter -handle cpu${i} -name mstatus_FS -type Uns32 -value 1
+        ihwsetparameter -handle cpu${i} -name Zfh -type bool -value 1
     }
     # Override default value of mstatus.VS to 1: Enable VE
+    # Also enables half precision FP
     if {("$::env(CPU_VARIANT)" == "RV32GCV") || ("$::env(CPU_VARIANT)" == "RV64GCV") || ("$::env(CPU_VARIANT)" == "X280")} {
         ihwsetparameter -handle cpu${i} -name mstatus_VS -type Uns32 -value 1
+        ihwsetparameter -handle cpu${i} -name fp16_version -value IEEE754 -type enum
+        ihwsetparameter -handle cpu${i} -name Zvfh -type bool -value 1
     }
     #RAM
     ihwaddmemory -instancename ram${i} -type ram

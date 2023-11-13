@@ -1,6 +1,6 @@
 
 ifeq ($(CC_TYPE),GCC)
-CFLAGS+= -flax-vector-conversions -static -DVWIDTH=16 -menable-experimental-extensions -DUPPERLIMIT=256
+CFLAGS+= -flax-vector-conversions -static -DVWIDTH=16 -menable-experimental-extensions -DUPPERLIMIT=512
 else
-CFLAGS+= -flax-vector-conversions -static -DVWIDTH=16 -menable-experimental-extensions -DUPPERLIMIT=256 -mcpu=sifive-x280
+CFLAGS+= -flax-vector-conversions -static -DVWIDTH=16 -menable-experimental-extensions -DUPPERLIMIT=512 -mcpu=sifive-x280
 endif

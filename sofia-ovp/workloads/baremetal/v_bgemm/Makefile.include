@@ -1,0 +1,6 @@
+
+ifeq ($(CC_TYPE),GCC)
+CFLAGS+= -flax-vector-conversions -static -DVWIDTH=256 -menable-experimental-extensions -DUPPERLIMIT=512
+else
+CFLAGS+= -flax-vector-conversions -static -DVWIDTH=256 -menable-experimental-extensions -DUPPERLIMIT=512 -mcpu=sifive-x280
+endif

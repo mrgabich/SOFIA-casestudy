@@ -4,7 +4,7 @@ IMPERAS_RISCV_TGT=RISCV64GCV
 ifeq ($(CC_TYPE),GCC)
     RISCV64GCV_CFLAGS    = -mabi=lp64d -march=rv64gcv_zfh_zvl512b
 else
-    RISCV64GCV_CFLAGS    = -mabi=lp64d -march=rv64gcv_zfh_zvl512b
+    RISCV64GCV_CFLAGS    = -mabi=lp64d -march=rv64gcv_zfh_zvfh_zvl512b
 endif
 
 # Target Library
