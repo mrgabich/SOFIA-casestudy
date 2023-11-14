@@ -38,16 +38,25 @@ function callHarvestLocal {
         echo "**************************************************************"
 
         # Call fault harvest to generate final report file
-        $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
+        
+        if [ -n "$OUTPUTDATA" ] && [ -f "$WORKING_FOLDER/Traces/GOLD_TRACE-0" ]; then
+                $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
                            --numberoffaults "$FAULTS_PER_PLATFORM" \
                            --application "$CURRENT_APPLICATION" \
                            --executiontime "$nsFaultCampaignBegin" \
                            --cores "$NUM_CORES" --cputype "$CPU_TYPE" \
                            --environment "$ENVIRONMENT" \
-                           #--outputdata         $OUTPUTDATA \
-                           #--outputdatasize     $OUTPUTDATA_SIZE \
-                           #--outputdataoffset   $OUTPUTDATA_OFFSET
-
+                           --outputdata         $OUTPUTDATA \
+                           --outputdatasize     $OUTPUTDATA_SIZE \
+                           --outputdataoffset   $OUTPUTDATA_OFFSET
+        else
+                $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
+                           --numberoffaults "$FAULTS_PER_PLATFORM" \
+                           --application "$CURRENT_APPLICATION" \
+                           --executiontime "$nsFaultCampaignBegin" \
+                           --cores "$NUM_CORES" --cputype "$CPU_TYPE" \
+                           --environment "$ENVIRONMENT" 
+        fi
         $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
                            --groupsdac --application $CURRENT_APPLICATION
 
@@ -874,11 +883,11 @@ do
         GOLD_EXEC=$SECONDS
         
         if [[ $ENABLE_TRACE -eq 1 ]]; then
-			GOLD_RUN="$GOLD_RUN --trace "
-		fi
+		GOLD_RUN="$GOLD_RUN --trace "
+	fi
                         
         if [[ $ENABLE_PROFILING -eq 1 ]]; then
-			GOLD_RUN="$GOLD_RUN --enabletools --extlib FIM/DUT0/cpu/cpuEstimator=${PROJECT_FOLDER}/cpuEstimator/model.so --callcommand \"FIM/DUT0/cpu_CPU0/cpuEstimator/instTrace -on\" --enableftrace"
+		GOLD_RUN="$GOLD_RUN --enabletools --extlib FIM/DUT0/cpu/cpuEstimator=${PROJECT_FOLDER}/cpuEstimator/model.so --callcommand \"FIM/DUT0/cpu_CPU0/cpuEstimator/instTrace -on\" --enableftrace"
         fi
 
         # Run the gold platform
@@ -891,10 +900,10 @@ do
 			# Return to the applications folder
 			cd "$APPLICATIONS_FOLDER" || exit
 			if [[ "$COUNTER" -eq "$VISITED_FOLDERS" ]]; then
-					break
+				break
 			else
-					COUNTER=$((COUNTER+1))
-					continue
+				COUNTER=$((COUNTER+1))
+				continue
 			fi
 		fi
 		

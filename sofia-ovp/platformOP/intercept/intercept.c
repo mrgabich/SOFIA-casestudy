@@ -559,18 +559,22 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                         // Cortex-M or baremetal
                         varSymbol = vmirtGetSymbolByName(processor, processorData->options.tracevariable);
                     }
-                    Addr varSize = vmirtGetSymbolSize(varSymbol);
-                    // Get final the reference result
-                    char* buffer = (char*) malloc (sizeof(char) * varSize);
-                    getSymbolValue(processor,processorData->options.tracevariable,buffer);
-                    // Gold file
-                    sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_GOLD, 0);
-                    fileTrace = fopen (tempString,"w+");
-                    // Write
-                    for (int i=0; i<varSize;i++){
-                        fprintf(fileTrace,"%02hhX",buffer[i]);
+                    if (varSymbol != NULL) {
+                        Addr varSize = vmirtGetSymbolSize(varSymbol);
+                        // Get final the reference result
+                        char* buffer = (char*) malloc (sizeof(char) * varSize);
+                        getSymbolValue(processor,processorData->options.tracevariable,buffer);
+                        // Gold file
+                        sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_GOLD, 0);
+                        fileTrace = fopen (tempString,"w+");
+                        // Write
+                        for (int i=0; i<varSize;i++){
+                            fprintf(fileTrace,"%02hhX",buffer[i]);
+                        }
+                        fclose(fileTrace);
+                    } else {
+                        vmiMessage("W",PREFIX_FIM,"Variable <%s> not found\n", processorData->options.tracevariable);
                     }
-                    fclose(fileTrace);
                 }
 
             } else { // Fault Injection Platform
@@ -653,18 +657,22 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                         // Cortex-M or baremetal
                         varSymbol = vmirtGetSymbolByName(processor, processorData->options.tracevariable);
                     }
-                    Addr varSize          = vmirtGetSymbolSize(varSymbol);
-                    // Get final the reference result
-                    char* buffer = (char*) malloc (sizeof(char) * varSize);
-                    getSymbolValue(processor,processorData->options.tracevariable,buffer);
-                    // Faulty file
-                    sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_FAULT, processorData->MACRO_PLATFORM_ID );
-                    fileTrace = fopen (tempString,"w+");
-                    // Write
-                    for (int i=0; i<varSize;i++){
-                        fprintf(fileTrace,"%02hhX",buffer[i]);
+                    if (varSymbol != NULL) {
+                        Addr varSize          = vmirtGetSymbolSize(varSymbol);
+                        // Get final the reference result
+                        char* buffer = (char*) malloc (sizeof(char) * varSize);
+                        getSymbolValue(processor,processorData->options.tracevariable,buffer);
+                        // Faulty file
+                        sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_FAULT, processorData->MACRO_PLATFORM_ID );
+                        fileTrace = fopen (tempString,"w+");
+                        // Write
+                        for (int i=0; i<varSize;i++){
+                            fprintf(fileTrace,"%02hhX",buffer[i]);
+                        }
+                        fclose(fileTrace);
+                    } else {
+                        vmiMessage("W",PREFIX_FIM,"Variable <%s> not found\n", processorData->options.tracevariable);
                     }
-                    fclose(fileTrace);
                 }
             }
         break; }
