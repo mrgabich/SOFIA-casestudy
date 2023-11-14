@@ -1,0 +1,4 @@
+
+
+AARCH64_CFLAGS=-mcpu=cortex-a710
+include $(BAREMETAL_FOLDER)/AARCH64.makefile.include
