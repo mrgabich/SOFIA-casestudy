@@ -1,4 +1,4 @@
-
-
-AARCH64_CFLAGS=-mcpu=cortex-a710
+#This is to use SVE extension
+#AARCH64_CFLAGS=-march=armv8.2-a+sve -mcpu=cortex-a75
+AARCH64_CFLAGS=-mcpu=cortex-a75
 include $(BAREMETAL_FOLDER)/AARCH64.makefile.include

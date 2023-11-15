@@ -62,7 +62,8 @@ function callHarvestLocal {
 
         $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
                            --groupsnn --application $CURRENT_APPLICATION
-
+        #Remove trace files
+        rm -Rf $WORKING_FOLDER/Traces/*
 }
 
 function generateFaultList {
@@ -467,7 +468,7 @@ function configureCommands {
         # Common attributes
         CMD_OVP="$CMD_OVP --quantum $TIME_SLICE --faulttype $FAULT_TYPE --targetcpucores $NUM_CORES --interceptlib $PLATFORM_FOLDER/intercept/model.so" #
 		
-		export vendor=arm.ovpworld.org
+	export vendor=arm.ovpworld.org
         # Workload definition
         case "$WORKLOAD_TYPE" in
                 WORKLOAD_BAREMETAL)

@@ -1,5 +1,7 @@
 ifeq ($(CC_TYPE),GCC)
-CFLAGS+= -fno-tree-vectorize -DUPPERLIMIT=512
+    CFLAGS+= -fno-tree-vectorize -DUPPERLIMIT=512
 else
-CFLAGS+= -fno-vectorize -DUPPERLIMIT=512
+    CFLAGS+= -DUPPERLIMIT=512 -fno-vectorize 
+    GCC_CFLAGS=-fno-tree-vectorize 
+    LLVM_CFLAGS=-fno-vectorize 
 endif
