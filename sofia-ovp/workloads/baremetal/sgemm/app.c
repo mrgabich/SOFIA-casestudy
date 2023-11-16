@@ -33,7 +33,7 @@
 #include <stdint.h>
 
 #ifndef OP_PRECISION
-#define OP_PRECISION int32_t
+#define OP_PRECISION int16_t
 #endif
 
 typedef OP_PRECISION matrix [UPPERLIMIT][UPPERLIMIT];

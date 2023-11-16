@@ -5,7 +5,8 @@ NOVLNV=1
 VERBOSE=1
 
 APP_ROOT?=$(WORKING_FOLDER)
-
+GCC_CFLAGS?= 
+LLVM_CFLAGS?= 
 CFLAGS= $(MAKEFILE_CFLAGS) -I$(APP_ROOT)/
 
 MULT?=
@@ -38,13 +39,13 @@ all: clean app$(MULT).$(CROSS).elf
 
 app$(MULT).$(CROSS).elf: $(EXE) $(INCOBJ) $(ASSCOBJ)
 	@    echo "# Linking $(CROSS) $@"
-	$(V) $(IMPERAS_LINK) -o $@ $^
+	$(V) $(IMPERAS_LINK) -o $@ $^ $(GCC_CFLAGS)
 	$(V) $(IMPERAS_OBJDUMP) -d $@ > app.FIM_log.lst
 	$(V) $(IMPERAS_OBJDUMP) -j .text -j .init -j .fini -j .rodata -j .data -j .bss -d $@ > app.lst
 
 %.o: %.c
 	@    echo "# Compiling $<"
-	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) -std=gnu99 $(CFLAGS)
+	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) -std=gnu99 $(CFLAGS) $(GCC_CFLAGS)
 
 %.o: %.s
 	@    echo "# Compiling $<"
@@ -52,20 +53,20 @@ app$(MULT).$(CROSS).elf: $(EXE) $(INCOBJ) $(ASSCOBJ)
 
 %$(MULT).$(CROSS).o: %.c
 	@    echo "# Compiling $(CROSS) $<"
-	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS)
+	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
 endif
 ifeq ($(wildcard *.c),)
 all: clean app$(MULT).$(CROSS).elf
 
 app$(MULT).$(CROSS).elf: $(EXEPP) $(INCOBJ) $(ASSCOBJ)
 	@    echo "# Linking $(CROSS) $@"
-	$(V) $(IMPERAS_LINKXX) -o $@ $^
+	$(V) $(IMPERAS_LINKXX) -o $@ $^ $(GCC_CFLAGS)
 	$(V) $(IMPERAS_OBJDUMP) -d $@ > app.FIM_log.lst
 	$(V) $(IMPERAS_OBJDUMP) -j .text -j .init -j .fini -j .rodata -j .data -j .bss -d $@ > app.lst
 
 %.o: %.cpp
 	@    echo "# Compiling $<"
-	$(V) $(IMPERAS_CXX) -lstdc++ -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS)
+	$(V) $(IMPERAS_CXX) -lstdc++ -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
 
 %.o: %.s
 	@    echo "# Compiling $<"
@@ -73,7 +74,7 @@ app$(MULT).$(CROSS).elf: $(EXEPP) $(INCOBJ) $(ASSCOBJ)
 
 %$(MULT).$(CROSS).o: %.c
 	@    echo "# Compiling $(CROSS) $<"
-	$(V) $(IMPERAS_CXX) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS)
+	$(V) $(IMPERAS_CXX) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
 
 endif
 # ---------------------------------------------------------------------------------------
@@ -85,11 +86,11 @@ all: clean $(TARGET_LST) $(TARGET_HEX)
 %.o: %.c
 	@echo Compiling $^
 	@mkdir -p $(dir $@)
-	$(V)$(IMPERAS_CC) -o $@ $(CFLAGS) -std=gnu99 -c $<
+	$(V)$(IMPERAS_CC) -o $@ $(CFLAGS) $(LLVM_CFLAGS) -std=gnu99 -c $<
 
 $(TARGET): $(EXE)
 	@echo Linking $@
-	$(V)$(IMPERAS_LINK) -o $@ $(IMPERAS_LDFLAGS) -lm -lc -std=gnu99 $(CFLAGS) $(EXE)
+	$(V)$(IMPERAS_LINK) -o $@ $(IMPERAS_LDFLAGS) -lm -lc -std=gnu99 $(CFLAGS) $(GCC_CFLAGS) $(EXE)
 
 $(TARGET_LST): $(TARGET)
 	@echo DBG Application $@
@@ -109,11 +110,11 @@ all: clean $(TARGET_LST) $(TARGET_HEX)
 %.o: %.cpp
 	@echo Compiling $^
 	@mkdir -p $(dir $@)
-	$(V)$(IMPERAS_CXX) -o $@ $(CFLAGS) -c $<
+	$(V)$(IMPERAS_CXX) -o $@ $(CFLAGS) $(LLVM_CFLAGS) -c $<
 
 $(TARGET): $(EXEPP)
 	@echo Linking $@
-	$(V)$(IMPERAS_LINKXX) -o $@ $(IMPERAS_LDFLAGS) -lm -lc $(CFLAGS) $(EXEPP)
+	$(V)$(IMPERAS_LINKXX) -o $@ $(IMPERAS_LDFLAGS) -lm -lc $(CFLAGS) $(GCC_CFLAGS) $(EXEPP)
 
 $(TARGET_LST): $(TARGET)
 	@echo DBG Application $@
