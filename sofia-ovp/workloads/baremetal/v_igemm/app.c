@@ -1,10 +1,7 @@
-
-
 /* $Id: matmult.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
 
 /* matmult.c */
 /* was mm.c! */
-
 
 /*----------------------------------------------------------------------*
  * To make this program compile under our assumed embedded environment,
@@ -19,7 +16,6 @@
  * Thomas Lundqvist at Chalmers.
  *----------------------------------------------------------------------*/
 
-
 /*
  * MATRIX MULTIPLICATION BENCHMARK PROGRAM:
  * This program multiplies 2 square matrices resulting in a 3rd
@@ -30,9 +26,10 @@
 // #define UPPERLIMIT 256
 
 #include "FIM.h"
+#include <stdint.h>
 
 #ifndef OP_PRECISION
-#define OP_PRECISION int
+#define OP_PRECISION int32_t
 #endif
 
 typedef OP_PRECISION matrix [UPPERLIMIT][UPPERLIMIT];
@@ -1078,7 +1075,6 @@ FIM_Instantiate();
 /* ***UPPSALA WCET***:
    no printing please! */
    Test(ArrayA, ArrayB, ResultArray);
-
 FIM_exit();
 }
 

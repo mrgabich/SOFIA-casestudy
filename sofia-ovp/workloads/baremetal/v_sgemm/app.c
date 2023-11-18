@@ -1,10 +1,7 @@
-
-
 /* $Id: matmult.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
 
 /* matmult.c */
 /* was mm.c! */
-
 
 /*----------------------------------------------------------------------*
  * To make this program compile under our assumed embedded environment,
@@ -18,7 +15,6 @@
  * This is a program that was developed from mm.c to matmult.c by
  * Thomas Lundqvist at Chalmers.
  *----------------------------------------------------------------------*/
-
 
 /*
  * MATRIX MULTIPLICATION BENCHMARK PROGRAM:
@@ -1079,7 +1075,6 @@ FIM_Instantiate();
 /* ***UPPSALA WCET***:
    no printing please! */
    Test(ArrayA, ArrayB, ResultArray);
-
 FIM_exit();
 }
 
