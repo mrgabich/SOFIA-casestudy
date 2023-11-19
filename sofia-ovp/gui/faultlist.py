@@ -227,6 +227,22 @@ class faultGenerator:
                         faultMask = masks[0]
                         for j in range (1, numFlips):
                             faultMask = ctypes.c_uint64(faultMask.value & masks[j].value)
+                    elif self.options.environment==environmentsE.ovparmv8.name \
+                        and targetregisters[faultRegisterIndex][1] in archregisters.simdfloatRegisters:
+                        bit_array = np.ones(128, dtype=np.uint8)
+                        if self.options.sequentialBits:
+                            maxN = (128-1) - numFlips
+                            shift = randint(0,maxN)
+                            for x in range(shift, shift+numFlips):
+                                shiftValues.append(x)
+                        else:
+                            shiftValues = sample(range(0,(128-1)), numFlips)
+                        for j in shiftValues:
+                            bit_array[j] ^= 1
+                        # Convert the bit array to bytes
+                        byte_array = np.packbits(bit_array)
+                        # Convert bytes to a hex string
+                        faultMask = byte_array.tobytes().hex()
                     elif targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
                         bit_array = np.ones(self.options.vecbw, dtype=np.uint8)
                         if self.options.sequentialBits:
@@ -365,7 +381,8 @@ class faultGenerator:
             if self.options.environment==environmentsE.ovparmv8.name \
                 or self.options.environment==environmentsE.gem5armv8.name \
                 or self.options.environment==environmentsE.riscv64.name:
-                if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                if targetregisters[faultRegisterIndex][1] in archregisters.vectorRegisters \
+                    or (self.options.environment==environmentsE.ovparmv8.name and targetregisters[faultRegisterIndex][1] in archregisters.simdfloatRegisters):
                     fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.upper()))
                 else:
                     fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))

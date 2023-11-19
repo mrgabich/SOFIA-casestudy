@@ -10,6 +10,7 @@ import copy
 import re
 from optparse   import OptionParser
 from random     import randint
+from random     import sample
 from array      import *
 import pylab as P
 import numpy as np
@@ -179,6 +180,7 @@ for i in range(1,options.numberoffaults+1):
     #fault targer and mask by fault type
     # register fault
     if options.faulttype == faultTypesE.register.name or options.faulttype == faultTypesE.functiontrace.name:
+        archregisters = archRegisters()
         # choose the register
         faultRegisterIndex = randint(0,len(possibleRegisters)-1)
         numberOfFaultsPerReg[int(possibleRegisters[faultRegisterIndex][0])]+=1
@@ -190,10 +192,14 @@ for i in range(1,options.numberoffaults+1):
                 faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
             elif options.environment==archtecturesE.riscv64.name:
                 if possibleRegisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
-                    targetBit = randint(0,int(options.vecbw))
-                    vecOffset = targetBit % 64
-                    mask64 = targetBit / 64
-                    faultMask = ctypes.c_uint64 (~(0x1<< mask64))   #Random mask of one bit between zero and 63 ones with Offset
+                    bit_array = np.ones(options.vecbw, dtype=np.uint8)
+                    shiftValues = sample(range(0,(options.vecbw-1)), 1)
+                    for j in shiftValues:
+                        bit_array[j] ^= 1
+                    # Convert the bit array to bytes
+                    byte_array = np.packbits(bit_array)
+                    # Convert bytes to a hex string
+                    faultMask = byte_array.tobytes().hex()
                 else:
                     faultMask = ctypes.c_uint64 (~(0x1<< randint(0,63)))    #Random mask of one bit between zero and 63 ones
             elif possibleRegisters[faultRegisterIndex][1]=="pc":
@@ -274,7 +280,14 @@ for i in range(1,options.numberoffaults+1):
         else:
             faultMask = ctypes.c_uint8(~(0x1<< randint(0,7)))    # random mask of one bit between zero and 31 ones
 
-
-
-    fileptr.write("%7d %10s %16s %4s %15d:%d %12X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
+    if options.environment==archtecturesE.ovparmv8.name \
+        or options.environment==archtecturesE.gem5armv8.name \
+        or options.environment==archtecturesE.riscv64.name:
+        if possibleRegisters[faultRegisterIndex][1] in archregisters.vectorRegisters \
+            or (options.environment==archtecturesE.ovparmv8.name and possibleRegisters[faultRegisterIndex][1] in archregisters.simdfloatRegisters):
+                fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.upper()))
+        else:
+            fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
+    else:
+        fileptr.write("%7d %10s %16s %4s %15d:%d %12X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
 fileptr.close()
