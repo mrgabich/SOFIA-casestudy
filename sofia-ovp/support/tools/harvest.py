@@ -157,6 +157,7 @@ if options.outputdata:
             Lines=open(dpfile).readlines()
             for line in Lines:
                 fault_appdata.append(line.split()[0])
+            os.remove(dpfile)
             #Remove empty places
             while("" in fault_appdata):
                 fault_appdata.remove("")
