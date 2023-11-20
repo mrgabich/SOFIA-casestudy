@@ -884,7 +884,7 @@ do
         GOLD_EXEC=$SECONDS
         
         if [[ $ENABLE_TRACE -eq 1 ]]; then
-		GOLD_RUN="$GOLD_RUN --trace "
+		GOLD_RUN_TRACE="$GOLD_RUN --trace "
 	fi
                         
         if [[ $ENABLE_PROFILING -eq 1 ]]; then
@@ -893,20 +893,64 @@ do
 
         # Run the gold platform
         # Check if the gold run was successful, if not exits the script
-		echo "$GOLD_RUN"
-		$GOLD_RUN |& tee ./PlatformLogs/goldlog || exit
-		
-		if [[ "$ONLY_GOLD" -eq 1 ]]; then
-			# Exit after N folders
-			# Return to the applications folder
-			cd "$APPLICATIONS_FOLDER" || exit
-			if [[ "$COUNTER" -eq "$VISITED_FOLDERS" ]]; then
-				break
-			else
-				COUNTER=$((COUNTER+1))
-				continue
-			fi
+	echo "$GOLD_RUN"
+        if [[ $ENABLE_TRACE -eq 1 ]]; then
+                if [[ $ENABLE_TRACE_INSTRUCTIONS -eq 1 ]]; then
+                        $GOLD_RUN_TRACE | sed 's/  */ /gp' \
+                        | sed "/Info 'FIM\/DUT0\/cpu0/!d" \
+                        | cut -d" "  -f5-5 \
+                        | sed 's/,\?#\([^,]*\|]\),\?/,/g' \
+                        | sed 's/\b[0-9a-fA-F]\{8\}\b//g' \
+                        | sed -e 's|\[||g' -e 's|\]||g' -e 's|[{}]||g' -e 's|[,.]||g' -e 's|[:!\-]||g' -e 's|[#][0-9]||g' -e 's/[^ ]*imediate[^ ]*//ig' \
+                        |  tr ' ' '\n' | sort | uniq -c \
+                        |& tee ./PlatformLogs/instruction_profile || exit
+                fi
+                if [[ $ENABLE_TRACE_REGISTERS -eq 1 ]]; then
+                        if [[ "$armType" == "arm" ]]; then
+                                $GOLD_RUN_TRACE | sed 's/  */ /gp' \
+                                | sed "/Info 'FIM\/DUT0\/cpu0/!d" \
+                                | cut -d" "  -f6- \
+                                | sed -n '/[[:punct:]]/p' \
+                                | sed 's/,\?#\([^,]*\|]\),\?/,/g' \
+                                | sed 's/,\([0-9]\{1,\}.*\)/,/' \
+                                | sed 's/\/[zm]//g' \
+                                | sed 's/\.16b//g' \
+                                | sed 's/\.d\[0\]//g' \
+                                | sed 's/\.[dbs]//g' \
+                                | sed -e 's|\[||g' -e 's|\]||g' -e 's|[{}()]| |g' \
+                                -e 's|[.]||g' -e 's|[,]| |g' -e 's|[:!\-]||g' \
+                                -e 's|[#][0-9]||g' -e 's/[^ ]*imediate[^ ]*//ig' \
+                                |  tr ' ' '\n' | sort | uniq -c \
+                                |& tee ./PlatformLogs/register_profile || exit
+                        else
+                                $GOLD_RUN_TRACE | sed 's/  */ /gp' \
+                                | sed "/Info 'FIM\/DUT0\/cpu0/!d" \
+                                | cut -d" "  -f6- \
+                                | sed -n '/[[:punct:]]/p' \
+                                | sed 's/,[^0-9]*-\([0-9]*\)/,/g' \
+                                | sed 's/,[^()]*(/,(/g' \
+                                | sed 's/,\([0-9]\{1,\}.*\)/,/' \
+                                | sed -e 's|\[||g' -e 's|\]||g' -e 's|[{}()]| |g' \
+                                -e 's|[,.]| |g' -e 's|[:!\-]||g' -e 's|[#][0-9]||g' \
+                                -e 's/[^ ]*imediate[^ ]*//ig' \
+                                |  tr ' ' '\n' | sort | uniq -c \
+                                |& tee ./PlatformLogs/register_profile || exit
+                        fi
+                fi
+        fi
+        $GOLD_RUN |& tee ./PlatformLogs/goldlog || exit
+	
+	if [[ "$ONLY_GOLD" -eq 1 ]]; then
+		# Exit after N folders
+		# Return to the applications folder
+		cd "$APPLICATIONS_FOLDER" || exit
+		if [[ "$COUNTER" -eq "$VISITED_FOLDERS" ]]; then
+			break
+		else
+			COUNTER=$((COUNTER+1))
+			continue
 		fi
+	fi
 		
         # Get run time of gold execution
         GOLD_EXEC=$((SECONDS - GOLD_EXEC))
