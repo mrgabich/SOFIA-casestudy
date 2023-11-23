@@ -27,7 +27,7 @@
 
 #include "FIM.h"
 #include <stdint.h>
-#include <stdio.h>
+// #include <stdio.h>
 
 #ifndef OP_PRECISION
 #define OP_PRECISION int16_t
