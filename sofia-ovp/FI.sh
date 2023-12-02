@@ -245,7 +245,7 @@ function compileApplication {
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_KERNEL" "$WORKING_FOLDER"
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_VKERNEL" "$WORKING_FOLDER"
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_BOOTLOADER" "$WORKING_FOLDER"
-                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]]; then
+                        if [[ "$ENVIRONMENT" = "ovparmv8" ]]; then
                         	cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_DTB" "$WORKING_FOLDER"
                         fi
                         # Compile the application
