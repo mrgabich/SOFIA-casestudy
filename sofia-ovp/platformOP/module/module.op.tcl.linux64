@@ -65,11 +65,12 @@ ihwaddprocessor -instancename cpu -type arm -vendor arm.ovpworld.org -version 1.
                 -mips 500
 ihwconnect    -instancename cpu -bus pBus -busmasterport INSTRUCTION
 ihwconnect    -instancename cpu -bus pBus -busmasterport DATA
-ihwsetparameter -handle       cpu -name variant                     -value Cortex-A57MPx4 -type enum
+ihwsetparameter -handle       cpu -name variant                     -value $::env(CPU_VARIANT) -type enum
 ihwsetparameter -handle       cpu -name compatibility               -value ISA        -type enum
 ihwsetparameter -handle       cpu -name UAL                         -value 1          -type boolean
 ihwsetparameter -handle       cpu -name override_CBAR               -value 0x2c000000 -type Uns32
 ihwsetparameter -handle       cpu -name override_GICD_TYPER_ITLines -value 4          -type Uns32
+ihwsetparameter -handle       cpu -name enableVFPAtReset            -value 1          -type bool
 
 # override_timerScaleFactor:
 #   By default use value of 5 to set the processors Generic Timers to 100 MHz (500MIPS/5) 

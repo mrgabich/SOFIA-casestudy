@@ -269,7 +269,7 @@ function compileApplication {
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_KERNEL" "$WORKING_FOLDER"
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_VKERNEL" "$WORKING_FOLDER"
                         cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_BOOTLOADER" "$WORKING_FOLDER"
-                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]]; then
+                        if [[ "$ENVIRONMENT" = "ovparmv8" ]]; then
                         	cp -rf "$LINUX_IMAGES_FOLDER/$LINUX_DTB" "$WORKING_FOLDER"
                         fi
                         # Compile the application
@@ -596,7 +596,7 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --objfilenoentry $LINUX_BOOTLOADER"
 
                                         ;; # End ARM_CORTEX_A9
-                                ARM_CORTEX_A53 | ARM_CORTEX_A57 | ARM_CORTEX_A72)
+                                ARM_CORTEX_A53 | ARM_CORTEX_A57 | ARM_CORTEX_A72 | ARM_CORTEX_AARCH64)
                                         # Environment
                                         export ENVIRONMENT=ovparmv8
 
@@ -623,7 +623,7 @@ function configureCommands {
                                         #~ export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
 
                                         # The arm A72 requires a different dtb
-                                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]]; then
+                                        if [ "$ARCHITECTURE" = "ARM_CORTEX_A72" ] | [ "$ARCHITECTURE" = "ARM_CORTEX_AARCH64" ]; then
                                                 export LINUX_DTB=foundation-v8-gicv3.dtb # Dtb files
                                         else
                                                 export LINUX_DTB=foundation-v8.dtb # Dtb files
@@ -635,6 +635,7 @@ function configureCommands {
                                                 ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
                                                 ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
                                                 ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
+                                                ARM_CORTEX_AARCH64) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75+sve";;
                                         esac
 
                                         # Define the workload path
@@ -688,7 +689,7 @@ function configureCommands {
                                         esac
 
                                         ;; # End ARMv8
-                                        RV64GC | RV64GCV)
+                                RV64GC | RV64GCV)
                                         # Environment
                                         export ENVIRONMENT=riscv64
 

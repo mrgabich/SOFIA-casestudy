@@ -79,6 +79,7 @@ ihwsetparameter -handle cpu -name compatibility      -value ISA             -typ
 ihwsetparameter -handle cpu -name UAL                -value 1               -type bool
 ihwsetparameter -handle cpu -name showHiddenRegs     -value 0               -type bool
 ihwsetparameter -handle cpu -name override_CBAR      -value 0x1e000000      -type uns32
+ihwsetparameter -handle cpu -name enableVFPAtReset   -value 1               -type bool
 
 #
 # Connect the supported interrupt request nets 
