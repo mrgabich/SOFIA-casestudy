@@ -1,88 +1,140 @@
+IMPERAS_HOME := $(shell getpath.exe "$(IMPERAS_HOME)")
+
 # Build locally without using a VLNV library
 NOVLNV=1
 VERBOSE=1
 
-AARCH64_CROSSCOMPILER   = $(AARCH64_TOOLCHAIN_LINUX)
-ARM_CORTEX_PREFIX       = $(AARCH64_TOOLCHAIN_LINUX_PREFIX)
-
-
-#Flags
-export AARCH64_LDFLAGS  = $(MAKEFILE_FLINKFLAGS)
-export AARCH64_CFLAGS   = $(MAKEFILE_CFLAGS)
-export AARCH64_AFLAGS   = $(MAKEFILE_CFLAGS)
-
-#AARCH64_LINKER_SCRIPT?=-T $(ARM_TOOLCHAIN_ROOT)/arm-none-linux-gnueabi/lib/generic-hosted.ld
-AARCH64_LDFLAGS0 += $(AARCH64_LINKER_SCRIPT)
-
-ifndef IMPERAS_HOME
-  IMPERAS_ERROR := $(error "IMPERAS_HOME not defined")
-endif
-ifndef IMPERAS_ARCH
-  IMPERAS_ERROR := $(error "IMPERAS_ARCH not defined")
-endif
-
-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/Makefile.common.include
-
-AARCH64_GCC      = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-gcc
-AARCH64_CC       = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-gcc $(AARCH64_CFLAGS) $(AARCH64_INCLUDES)
-AARCH64_CXX      = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-g++ $(AARCH64_CFLAGS) $(AARCH64_INCLUDES)
-AARCH64_LINK     = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-gcc $(AARCH64_CFLAGS) $(AARCH64_INCLUDES) $(AARCH64_LDFLAGS0)
-AARCH64_LINKXX   = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-g++ $(AARCH64_CFLAGS) $(AARCH64_INCLUDES) $(AARCH64_LDFLAGS0)
-AARCH64_AS       = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-as  $(AARCH64_CFLAGS)
-AARCH64_LD       = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-ld
-AARCH64_AR       = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-ar
-AARCH64_NM       = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-nm
-AARCH64_RANLIB   = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-ranlib
-AARCH64_STRIP    = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-strip
-AARCH64_READELF  = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-readelf
-AARCH64_OBJDUMP  = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-objdump
-AARCH64_OBJCOPY  = $(AARCH64_CROSSCOMPILER)/bin/$(ARM_CORTEX_PREFIX)-objcopy
-AARCH64_GDB      = $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/gdb/aarch64-none-elf-gdb
-
-#If hava a custom makefile
-ifeq ($(shell find -name "makefile.include"),./makefile.include)
-include makefile.include
-else
-#Others
-.SUFFIXES: .c .cpp
-
-.PHONY: cleanObj
+APP_ROOT?=$(WORKING_FOLDER)
+GCC_CFLAGS?= 
+LLVM_CFLAGS?= 
+CFLAGS= $(MAKEFILE_CFLAGS) -I$(APP_ROOT)/
 
 MULT?=
 DEF?=
 
-SRC?=$(shell find . -type f -name '*.c' -o -name '*.cpp' | grep -v "./Data*" | sort)
+TARGET:=    app$(MULT).$(CROSS).elf
+TARGET_LST:=app$(MULT).$(CROSS).lst
+TARGET_BIN:=app$(MULT).$(CROSS).bin
+TARGET_HEX:=app$(MULT).$(CROSS).hex
+TARGET_MAP:=app$(MULT).$(CROSS).map
 
-INCOBJ=$(patsubst %.c,%$(MULT).$(CROSS).o,$(shell find .  -type f -name '*.c' | grep -v "./Data*" | sort )) $(patsubst %.cpp,%$(MULT).$(CROSS).o,$(shell find . -type f -name '*.cpp' | grep -v "./Data*" | sort))
-EXE=app.$(CROSS).elf
+#SRC?=$(shell find . -type f -name '*.c' -o -name '*.cpp' | grep -v "./Data*" | sort)
+SRC?=$(wildcard *.c)
+ASRC?=$(wildcard *.s)
+SRCPP?=$(wildcard *.cpp)
+SRCINC?=
+SSDBG?=
+ASSCOBJ=$(patsubst %.s,%.o,$(ASRC))
+EXE=$(patsubst %.c,%.o,$(SRC))
+EXEPP=$(patsubst %.cpp,%.o,$(SRCPP))
+#INCOBJ=$(patsubst %.c,%$(MULT).$(CROSS).o,$(shell find .  -type f -name '*.c' | grep -v "./Data*" | sort )) $(patsubst %.cpp,%$(MULT).$(CROSS).o,$(shell find . -type f -name '*.cpp' | grep -v "./Data*" | sort))
+INCOBJ=$(patsubst %.c,%$(MULT).$(CROSS).o,$(SRCINC))
 
-V=
 
-all: cleanObj print $(EXE) cleanObj 
 
-print::
-	@    echo "Print $(INCOBJ) - $(SRC)"
-	
-$(EXE): $(INCOBJ)
+-include $(LINUX_FOLDER)/AARCH64.makefile.include
+-include Makefile.include
+
+# ---------------------------------------------------------------------------------------
+# gcc
+ifeq ($(CC_TYPE),GCC)
+ifeq ($(wildcard *.cpp),)
+all: clean app$(MULT).$(CROSS).elf
+
+app$(MULT).$(CROSS).elf: $(EXE) $(INCOBJ) $(ASSCOBJ)
 	@    echo "# Linking $(CROSS) $@"
-	@    echo $(INCOBJ)
-	$(V) $(AARCH64_LINK) -o $@ $^ $(AARCH64_LDFLAGS) $(AARCH64_LDFLAGS0)
-	$(V) $(AARCH64_OBJDUMP) -d $@ > $@.lst
-	$(V) rm -f *.o
+	$(V) $(IMPERAS_LINK) -o $@ $^ $(GCC_CFLAGS)
+	$(V) $(IMPERAS_OBJDUMP) -d $@ > app.FIM_log.lst
+	$(V) $(IMPERAS_OBJDUMP) -j .text -j .init -j .fini -j .rodata -j .data -j .bss -d $@ > app.lst
 
-%$(MULT).$(CROSS).o: %.cpp
-	@    echo "# Compiling cpp $(CROSS) $<"
-	$(V) $(AARCH64_CXX) -c -o $@ $< -D$(CROSS) $(DEF)
+%.o: %.c
+	@    echo "# Compiling $<"
+	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) -std=gnu99 $(CFLAGS) $(GCC_CFLAGS)
+
+%.o: %.s
+	@    echo "# Compiling $<"
+	$(V) $(IMPERAS_AS) -o $@ $< $(ASSDBG)
 
 %$(MULT).$(CROSS).o: %.c
 	@    echo "# Compiling $(CROSS) $<"
-	$(V) $(AARCH64_CC) -c -o $@ $< -D$(CROSS) $(DEF)
-
-cleanObj:
-	@    echo "# Clean"
-	$(V) rm -f *.o
-
-clean:
-	- rm -f *.$(CROSS).elf *.$(CROSS).o
-	
+	$(V) $(IMPERAS_CC) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
 endif
+ifeq ($(wildcard *.c),)
+all: clean app$(MULT).$(CROSS).elf
+
+app$(MULT).$(CROSS).elf: $(EXEPP) $(INCOBJ) $(ASSCOBJ)
+	@    echo "# Linking $(CROSS) $@"
+	$(V) $(IMPERAS_LINKXX) -o $@ $^ $(GCC_CFLAGS)
+	$(V) $(IMPERAS_OBJDUMP) -d $@ > app.FIM_log.lst
+	$(V) $(IMPERAS_OBJDUMP) -j .text -j .init -j .fini -j .rodata -j .data -j .bss -d $@ > app.lst
+
+%.o: %.cpp
+	@    echo "# Compiling $<"
+	$(V) $(IMPERAS_CXX) -lstdc++ -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
+
+%.o: %.s
+	@    echo "# Compiling $<"
+	$(V) $(IMPERAS_AS) -o $@ $< $(ASSDBG)
+
+%$(MULT).$(CROSS).o: %.c
+	@    echo "# Compiling $(CROSS) $<"
+	$(V) $(IMPERAS_CXX) -c -o $@ $< -D$(CROSS) $(DEF) $(CFLAGS) $(GCC_CFLAGS)
+
+endif
+# ---------------------------------------------------------------------------------------
+# clang
+else
+ifeq ($(wildcard *.cpp),)
+all: clean $(TARGET_LST) $(TARGET_HEX)
+
+%.o: %.c
+	@echo Compiling $^
+	@mkdir -p $(dir $@)
+	$(V)$(IMPERAS_CC) -o $@ $(CFLAGS) $(LLVM_CFLAGS) -std=gnu99 -c $<
+
+$(TARGET): $(EXE)
+	@echo Linking $@
+	$(V)$(IMPERAS_LINK) -o $@ $(IMPERAS_LDFLAGS) -lm -lc -std=gnu99 $(CFLAGS) $(GCC_CFLAGS) $(EXE)
+
+$(TARGET_LST): $(TARGET)
+	@echo DBG Application $@
+	$(V)$(IMPERAS_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $< > $@
+
+$(TARGET_BIN): $(TARGET)
+	@echo Linking $@
+	$(V)$(IMPERAS_OBJCOPY) -O binary $< $@
+
+$(TARGET_HEX): $(TARGET)
+	@echo HEX to $@
+	$(V)$(IMPERAS_OBJCOPY) -O verilog $< $@
+endif
+ifeq ($(wildcard *.c),)
+all: clean $(TARGET_LST) $(TARGET_HEX)
+
+%.o: %.cpp
+	@echo Compiling $^
+	@mkdir -p $(dir $@)
+	$(V)$(IMPERAS_CXX) -o $@ $(CFLAGS) $(LLVM_CFLAGS) -c $<
+
+$(TARGET): $(EXEPP)
+	@echo Linking $@
+	$(V)$(IMPERAS_LINKXX) -o $@ $(IMPERAS_LDFLAGS) -lm -lc $(CFLAGS) $(GCC_CFLAGS) $(EXEPP)
+
+$(TARGET_LST): $(TARGET)
+	@echo DBG Application $@
+	$(V)$(IMPERAS_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $< > $@
+
+$(TARGET_BIN): $(TARGET)
+	@echo Linking $@
+	$(V)$(IMPERAS_OBJCOPY) -O binary $< $@
+
+$(TARGET_HEX): $(TARGET)
+	@echo HEX to $@
+	$(V)$(IMPERAS_OBJCOPY) -O verilog $< $@
+endif
+endif
+
+# ---------------------------------------------------------------------------------------
+
+clean::
+	- rm -f *.$(CROSS).elf *.$(CROSS).o 

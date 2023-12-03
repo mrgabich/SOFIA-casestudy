@@ -635,7 +635,8 @@ function configureCommands {
                                                 ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
                                                 ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
                                                 ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
-                                                ARM_CORTEX_AARCH64) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75+sve";;
+                                                ARM_CORTEX_AARCH64) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75"; 
+                                                                    CMD_OVP="$CMD_OVP --override override_AA64PFR0_EL1=0x111112222 --override SVEImplementedSizes=0xf --override SVEFaultUnknown=0xdfdfdfdfdfdfdfdf";;
                                         esac
 
                                         # Define the workload path
@@ -741,8 +742,8 @@ function configureCommands {
 
                         # Flags to export to the Makefile
                         export NUM_THREADS="$NUM_CORES"
-                        export MAKEFILE_CFLAGS="-O3 -g -w -gdwarf-2 -mcpu=$MPUFLAG -mlittle-endian -DUNIX -static -I$OVP_FIM -D$ENVIRONMENT -DOPEN -DNUM_THREAD=4 -fopenmp -pthread"
-                        export MAKEFILE_FLINKFLAGS="-static -fopenmp -I$OVP_FIM -D$ENVIRONMENT -lm -lstdc++"
+                        export MAKEFILE_CFLAGS="-O3 -g -w -gdwarf-2 -mcpu=$MPUFLAG -mlittle-endian -DUNIX -static -I$OVP_FIM -D$ENVIRONMENT -DOPEN -DNUM_THREAD=4 -fopenmp -pthread -fcommon"
+                        export MAKEFILE_FLINKFLAGS="-static -fopenmp -I$OVP_FIM -D$ENVIRONMENT -lm -lstdc++ -fcommon"
 
                         # Check if the OVPFIM run time caller is compiled
                         if [[ ! -e "$OVPFIM_EXEC" ]]; then
