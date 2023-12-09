@@ -246,11 +246,10 @@ void initProcessorInstFIM(Uns32 processorNumber) {
 
     if(MACRO_BAREMETAL_MODE_FLAG) { // !!!! Only valid to one core processor
         if((!strcmp(options.environment,"ovparmv7") || 
-            !strcmp(options.environment,"ovparmv8") || 
+            !strcmp(opProcessorVariant(PE.processorObj),"AArch64") || 
             !strcmp(options.environment,"riscv32") || 
             !strcmp(options.environment,"riscv64")) && 
-            ( strcmp(opProcessorVariant(PE.processorObj),"X280") ||
-            !strcmp(opProcessorVariant(PE.processorObj),"AArch64")))
+            ( strcmp(opProcessorVariant(PE.processorObj),"X280")))
             PE.childrens[0]=PE.processorObj;
         else //Using the multicore for baremetal armv8
             PE.childrens[0]=opProcessorChild(PE.processorObj);

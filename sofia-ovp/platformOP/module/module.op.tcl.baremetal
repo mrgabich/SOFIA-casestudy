@@ -46,8 +46,15 @@ for {set i 0} {$i < 1} {incr i} {
         ("$::env(CPU_VARIANT)" == "Cortex-A15UP") || ("$::env(CPU_VARIANT)" == "Cortex-M4F") || 
         ("$::env(CPU_VARIANT)" == "Cortex-M7F") || ("$::env(CPU_VARIANT)" == "Cortex-M33F") || 
         ("$::env(CPU_VARIANT)" == "Cortex-A53MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A57MPx1") || 
-        ("$::env(CPU_VARIANT)" == "Cortex-A72MPx1") || ("$::env(CPU_VARIANT)" == "AArch64")} {
+        ("$::env(CPU_VARIANT)" == "Cortex-A72MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A75MPx1") || 
+        ("$::env(CPU_VARIANT)" == "AArch64")} {
         ihwsetparameter -handle cpu${i} -name enableVFPAtReset -type bool -value 1
+        #Enable SVE at Armv8-A
+        if {("$::env(CPU_VARIANT)" == "Cortex-A72MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A75MPx1")} {
+            ihwsetparameter -handle cpu${i} -name override_AA64PFR0_EL1       -value 0x111112222          -type Uns64
+            ihwsetparameter -handle cpu${i} -name SVEImplementedSizes         -value 0xf                  -type Uns32
+            ihwsetparameter -handle cpu${i} -name SVEFaultUnknown             -value 0xdfdfdfdfdfdfdfdf   -type Uns64
+        }
     }
     
     #RAM

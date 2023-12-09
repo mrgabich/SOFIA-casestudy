@@ -67,10 +67,15 @@ ihwconnect    -instancename cpu -bus pBus -busmasterport INSTRUCTION
 ihwconnect    -instancename cpu -bus pBus -busmasterport DATA
 ihwsetparameter -handle       cpu -name variant                     -value $::env(CPU_VARIANT) -type enum
 #This part enables 512bit length SVE
-if {("$::env(CPU_VARIANT)" == "Cortex-A75MPx1") || ("$::env(CPU_VARIANT)" == "Cortex-A75MPx2") || ("$::env(CPU_VARIANT)" == "Cortex-A75MPx3") || ("$::env(CPU_VARIANT)" == "Cortex-A75MPx4")} {
+if {("$::env(CPU_VARIANT)" == "Cortex-A75MPx1") || 
+    ("$::env(CPU_VARIANT)" == "Cortex-A75MPx2") || 
+    ("$::env(CPU_VARIANT)" == "Cortex-A75MPx3") || 
+    ("$::env(CPU_VARIANT)" == "Cortex-A75MPx4")} {
     ihwsetparameter -handle       cpu -name override_AA64PFR0_EL1       -value 0x111112222          -type Uns64
     ihwsetparameter -handle       cpu -name SVEImplementedSizes         -value 0xf                  -type Uns32
     ihwsetparameter -handle       cpu -name SVEFaultUnknown             -value 0xdfdfdfdfdfdfdfdf   -type Uns64
+    #ihwsetparameter -handle       cpu -name override_SCTLR_V            -value 1                    -type bool
+    #ihwsetparameter -handle       cpu -name override_mask_ACTLR_EL3     -value 0x73                 -type Uns64
 }
 ihwsetparameter -handle       cpu -name compatibility               -value ISA        -type enum
 ihwsetparameter -handle       cpu -name UAL                         -value 1          -type boolean
