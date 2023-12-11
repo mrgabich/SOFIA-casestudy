@@ -1095,9 +1095,17 @@ void Initialize(matrix Array, OP_PRECISION table[UPPERLIMIT][UPPERLIMIT])
 {
    int OuterIndex, InnerIndex;
 
-   for (OuterIndex = 0; OuterIndex < UPPERLIMIT; OuterIndex++)
-      for (InnerIndex = 0; InnerIndex < UPPERLIMIT; InnerIndex++)
+   for (OuterIndex = 0; OuterIndex < UPPERLIMIT; OuterIndex++) {
+      #pragma clang align
+      #pragma clang loop unroll(enable)
+      #pragma clang loop vectorize(enable) interleave(enable)
+      #if(VWIDTH != 0)
+      #pragma clang loop vectorize_width(VWIDTH)
+      #endif
+      for (InnerIndex = 0; InnerIndex < UPPERLIMIT; InnerIndex++) {
          Array[OuterIndex][InnerIndex] = table[OuterIndex][InnerIndex];
+      }
+   }
 }
 
 void Multiply(matrix A, matrix B, matrix Res)
@@ -1107,9 +1115,8 @@ void Multiply(matrix A, matrix B, matrix Res)
 {
    register int Outer, Inner, Index;
 
-   for (Outer = 0; Outer < UPPERLIMIT; Outer++)
-      for (Inner = 0; Inner < UPPERLIMIT; Inner++)
-      {
+   for (Outer = 0; Outer < UPPERLIMIT; Outer++) {
+      for (Inner = 0; Inner < UPPERLIMIT; Inner++) {
          Res [Outer][Inner] = 0;
          #pragma clang align
          #pragma clang loop unroll(enable)
@@ -1117,8 +1124,10 @@ void Multiply(matrix A, matrix B, matrix Res)
          #if(VWIDTH != 0)
          #pragma clang loop vectorize_width(VWIDTH)
          #endif
-         for (Index = 0; Index < UPPERLIMIT; Index++)
+         for (Index = 0; Index < UPPERLIMIT; Index++) {
             Res[Outer][Inner]  +=
                A[Outer][Index] * B[Index][Inner];
-       }
+         }
+      }
+   }
 }
