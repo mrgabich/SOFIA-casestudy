@@ -267,6 +267,7 @@ def runHarness(pid, application, execute, path, serverPath):
 def run():
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
+    running=0
     for pid in range(1, args.nFaults + 1):
         function = runHarness
         functionArgs = (
@@ -284,9 +285,11 @@ def run():
                 functionArgs,
                 subFunctions,
                 libraries))
-        # if len(ppservers) == 0:
+        running+=1
+        if len(ppservers) == 0 and running == args.localWorkers:
+            running=0
             # Define sleep for each thread
-            # time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(1, 3))
     for job in jobs:
         res = job()
 
@@ -298,6 +301,7 @@ def run():
 def runErrors(pids):
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
+    running=0
     for pid in pids:
         function = runHarness
         functionArgs = (
@@ -315,7 +319,10 @@ def runErrors(pids):
                 functionArgs,
                 subFunctions,
                 libraries))
-        if len(ppservers) == 0:
+        running+=1
+        if len(ppservers) == 0 and running == args.localWorkers:
+            running=0
+            print("workers")
             # Define sleep for each thread
             time.sleep(random.uniform(1, 3))
     for job in jobs:
