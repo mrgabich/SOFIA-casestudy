@@ -38,8 +38,7 @@ function callHarvestLocal {
         echo "**************************************************************"
 
         # Call fault harvest to generate final report file
-        
-        if [ -n "$OUTPUTDATA" ] && [ -f "$WORKING_FOLDER/Traces/GOLD_TRACE-0" ]; then
+        if [[ -n "$OUTPUTDATA" ]] && [[ -f "$WORKING_FOLDER/Traces/GOLD_TRACE-0" ]]; then
                 $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
                            --numberoffaults "$FAULTS_PER_PLATFORM" \
                            --application "$CURRENT_APPLICATION" \
@@ -217,15 +216,21 @@ function compileApplication {
                 echo "Application $CURRENT_APPLICATION does not recognized for this workload" && exit
         fi
         # Updated the application folder in the workspace
-        rm -rf "$WORKING_FOLDER"
+        if [[ ! -d "$WORKING_FOLDER" ]] && [[ "$ONLY_HANGS" -eq 1 ]]; then
+                echo "Application $CURRENT_APPLICATION FI campaign not exists, check the ONLY_HANGS parameter!" && exit
+        elif [[ "$ONLY_HANGS" -eq 0 ]]; then
+            rm -rf "$WORKING_FOLDER"
+        fi
         rsync -qavR --exclude="$CURRENT_APPLICATION/Data" "$CURRENT_APPLICATION" "$WORKSPACE"
         # Enter in the application folder in the workspace
         cd "$WORKING_FOLDER" || exit
         # Copy the simulator executable and linux
         cp -rf "$PLATFORM_FOLDER/harness/harness.$IMPERAS_ARCH.exe" .
 
-        # Create infrastructure folders
-        mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling ./Traces
+        if [[ "$ONLY_HANGS" -eq 0 ]]; then
+            # Create infrastructure folders
+            mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling ./Traces
+        fi
         # New variable for arguments
         SIM_ARGS=
         # In some makefile is definied CROSS
@@ -289,11 +294,11 @@ function compileApplication {
                         else
                                 APPLICATIONS_ARGS=
                         fi
-                       
+
                         # Copy the script and update the template
                         cp -rf "$LINUX_FOLDER/$LINUX_RUNSCRIPT" .
 						sed -i "s#APPLICATION=.*#APPLICATION=\"./$APPLICATIONS_NAME $APPLICATIONS_ARGS\" #" "$LINUX_RUNSCRIPT"
-                         
+
                         # Application path inside the linux image
                         sed -i "s#APP_PATH=.*#APP_PATH=\"/$LINUX_HOME_ROOT/$WORKLOAD_TYPE/$CURRENT_APPLICATION\" #" "$LINUX_RUNSCRIPT"
                         # Image dump name
@@ -467,8 +472,8 @@ function configureCommands {
         # Simulator dependent defines and variables 0.0000001
         # Common attributes
         CMD_OVP="$CMD_OVP --quantum $TIME_SLICE --faulttype $FAULT_TYPE --targetcpucores $NUM_CORES --interceptlib $PLATFORM_FOLDER/intercept/model.so" #
-		
-	export vendor=arm.ovpworld.org
+
+        export vendor=arm.ovpworld.org
         # Workload definition
         case "$WORKLOAD_TYPE" in
                 WORKLOAD_BAREMETAL)
@@ -543,7 +548,7 @@ function configureCommands {
                         #~ elif [[ "$ARCHITECTURE" = 'ARM_CORTEX_M0' ]]; then
                                 #~ CMD_OVP="$CMD_OVP --override compatibility=nopSVC "
                         #~ fi
-                        
+
                         ;; # End baremetal
                 WORKLOAD_LINUX)
                         case "$ARCHITECTURE" in
@@ -795,6 +800,10 @@ configureOVP(){
         # Create script to init ovp
         python3 "${PROJECT_FOLDER}/initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}" -p "${SIMULATOR_PATH}"
         source ovp.sh &>/dev/null
+        if [[ $ONLY_HANGS -eq 1 ]]; then
+            CHECK_HANGS=1
+            GENERATE_FAULT_LIST=NO_GENERATION
+        fi
 }
 
 ################################################################################################
@@ -843,7 +852,7 @@ do
 				cat "$WORKSPACE/make.harness"
 				exit 1
 		fi # Check if make was successfully, if not exits the script
-		
+
         # Remove the last slash
         CURRENT_APPLICATION=${applicationFolders%*/}
 
@@ -885,18 +894,18 @@ do
 
         # Get time before running gold
         GOLD_EXEC=$SECONDS
-        
+
         if [[ $ENABLE_TRACE -eq 1 ]]; then
-		GOLD_RUN_TRACE="$GOLD_RUN --trace "
-	fi
-                        
+            GOLD_RUN_TRACE="$GOLD_RUN --trace "
+        fi
+
         if [[ $ENABLE_PROFILING -eq 1 ]]; then
-		GOLD_RUN="$GOLD_RUN --enabletools --extlib FIM/DUT0/cpu/cpuEstimator=${PROJECT_FOLDER}/cpuEstimator/model.so --callcommand \"FIM/DUT0/cpu_CPU0/cpuEstimator/instTrace -on\" --enableftrace"
+            GOLD_RUN="$GOLD_RUN --enabletools --extlib FIM/DUT0/cpu/cpuEstimator=${PROJECT_FOLDER}/cpuEstimator/model.so --callcommand \"FIM/DUT0/cpu_CPU0/cpuEstimator/instTrace -on\" --enableftrace"
         fi
 
         # Run the gold platform
         # Check if the gold run was successful, if not exits the script
-	echo "$GOLD_RUN"
+        echo "$GOLD_RUN"
         if [[ $ENABLE_TRACE -eq 1 ]]; then
                 if [[ $ENABLE_TRACE_INSTRUCTIONS -eq 1 ]]; then
                         $GOLD_RUN_TRACE | sed 's/  */ /gp' \
@@ -942,19 +951,19 @@ do
                 fi
         fi
         $GOLD_RUN |& tee ./PlatformLogs/goldlog || exit
-	
-	if [[ "$ONLY_GOLD" -eq 1 ]]; then
-		# Exit after N folders
-		# Return to the applications folder
-		cd "$APPLICATIONS_FOLDER" || exit
-		if [[ "$COUNTER" -eq "$VISITED_FOLDERS" ]]; then
-			break
-		else
-			COUNTER=$((COUNTER+1))
-			continue
-		fi
-	fi
-		
+
+        if [[ "$ONLY_GOLD" -eq 1 ]]; then
+            # Exit after N folders
+            # Return to the applications folder
+            cd "$APPLICATIONS_FOLDER" || exit
+            if [[ "$COUNTER" -eq "$VISITED_FOLDERS" ]]; then
+                break
+            else
+                COUNTER=$((COUNTER+1))
+                continue
+            fi
+        fi
+
         # Get run time of gold execution
         GOLD_EXEC=$((SECONDS - GOLD_EXEC))
 
@@ -969,9 +978,9 @@ do
         # Harness (FI)
         export NODES=$FAULTS_PER_PLATFORM;
 
-		make clean all VERBOSE=1 OPT=$OPTF CFLAGS+=-fcommon -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/makeh2"
-		cp -rf "$PLATFORM_FOLDER/harness"/*exe "$WORKING_FOLDER"
-		
+        make clean all VERBOSE=1 OPT=$OPTF CFLAGS+=-fcommon -C "$PLATFORM_FOLDER/harness" &> "$WORKSPACE/makeh2"
+        cp -rf "$PLATFORM_FOLDER/harness"/*exe "$WORKING_FOLDER"
+
         echo "**************************************************************"
         echo -e "\e[31mBeginning Fault Injection Campaign \e[0m"
         echo "**************************************************************"
@@ -989,15 +998,29 @@ do
         sFaultCampaignBegin="$(date +%s%N)"
         export sFaultCampaignBegin
 
-		configureOVP
+        configureOVP
 
-		# Execute the FI platform
-		python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}"
-		# Execute fault harvest
-		callHarvestLocal
-		# Ending
-		#cat ./*reportfile
-		cp -rf ./*reportfile "$WORKSPACE"
+        if [[ "$ONLY_HANGS" -eq 0 ]]; then
+            # Execute the FI platform
+            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}"
+
+            # Execute fault harvest
+            callHarvestLocal
+            # Ending
+            #cat ./*reportfile
+            cp -rf ./*reportfile "$WORKSPACE"
+        fi
+
+        if [[ "$CHECK_HANGS" -eq 1 ]] || [[ "$ONLY_HANGS" -eq 1 ]]; then
+            # Execute the FI platform
+            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}" -e "${CHECK_HANGS}" 
+
+       		# Execute fault harvest
+            callHarvestLocal
+            # Ending
+            #cat ./*reportfile
+            cp -rf ./*reportfile "$WORKSPACE"
+        fi
 
         # Exit after N folders
         # Return to the applications folder

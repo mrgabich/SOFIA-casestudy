@@ -284,9 +284,9 @@ def run():
                 functionArgs,
                 subFunctions,
                 libraries))
-        if len(ppservers) == 0:
+        # if len(ppservers) == 0:
             # Define sleep for each thread
-            time.sleep(random.uniform(0, 3))
+            # time.sleep(random.uniform(1, 2))
     for job in jobs:
         res = job()
 
@@ -315,7 +315,9 @@ def runErrors(pids):
                 functionArgs,
                 subFunctions,
                 libraries))
-
+        if len(ppservers) == 0:
+            # Define sleep for each thread
+            time.sleep(random.uniform(1, 3))
     for job in jobs:
         res = job()
 
@@ -350,7 +352,7 @@ def checkHangs():
     subprocess.call(
         "grep \"Hang\" " +
         args.application +
-        ".* | tr -s ' ' | cut -d' ' -f2 >> errors",
+        "*.reportfile | tr -s ' ' | cut -d' ' -f2 >> errors",
         shell=True)
     if os.path.isfile('./errors'):
         pids = readErrors("errors")
@@ -502,10 +504,11 @@ def main():
     print("Running Gold")
     goldTimeOut()
     if (args.hang == 1):
-        print("Checking for hangs")
+        print("Checking for hangs...")
+        # for checking in range(3):
         pidsList = checkHangs()
-        print(pidsList)
-        print("Running Hangs")
+        #print(pidsList)
+        print("Running Hangs: ")
         runErrors(pidsList)
     else:
         print("Running FI")
