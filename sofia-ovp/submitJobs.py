@@ -289,7 +289,7 @@ def run():
         if len(ppservers) == 0 and running == args.localWorkers:
             running=0
             # Define sleep for each thread
-            time.sleep(random.uniform(1, 3))
+            time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 
@@ -322,9 +322,8 @@ def runErrors(pids):
         running+=1
         if len(ppservers) == 0 and running == args.localWorkers:
             running=0
-            print("workers")
             # Define sleep for each thread
-            time.sleep(random.uniform(1, 3))
+            time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 

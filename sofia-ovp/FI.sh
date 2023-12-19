@@ -960,6 +960,10 @@ do
                 break
             else
                 COUNTER=$((COUNTER+1))
+                if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+                    #Sleep to reduce host OS load and avoid hangs
+                    sleep 2m
+                fi
                 continue
             fi
         fi
@@ -967,7 +971,7 @@ do
         # Get run time of gold execution
         GOLD_EXEC=$((SECONDS - GOLD_EXEC))
 
-        GOLD_EXEC=$((GOLD_EXEC*3))
+        GOLD_EXEC=$(((GOLD_EXEC+1)*4))
 
         # Create the checkpoints when required
         generateCheckpoints
@@ -1012,6 +1016,10 @@ do
         fi
 
         if [[ "$CHECK_HANGS" -eq 1 ]] || [[ "$ONLY_HANGS" -eq 1 ]]; then
+            if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+                #Sleep to reduce host OS load and avoid hangs
+                sleep 2m
+            fi
             # Execute the FI platform
             python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}" -e "${CHECK_HANGS}" 
 
@@ -1029,6 +1037,10 @@ do
                 break
         else
                 COUNTER=$((COUNTER+1))
+                if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+                    #Sleep to reduce host OS load and avoid hangs
+                    sleep 2m
+                fi
         fi
 
 done # For dir
