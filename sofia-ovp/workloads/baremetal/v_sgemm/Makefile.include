@@ -1,9 +1,9 @@
 ifeq ($(CC_TYPE),GCC)
-    CFLAGS+= -flax-vector-conversions -static -DVWIDTH=32 -DUPPERLIMIT=512
+    CFLAGS+= -flax-vector-conversions -static -DVWIDTH=0 -DUPPERLIMIT=512
 else
     ifeq ($(ENVIRONMENT),riscv64)
-        CFLAGS+= -flax-vector-conversions -static -DVWIDTH=32 -DUPPERLIMIT=512 -mrvv-vector-bits=512 -Rpass=.*
+        CFLAGS+= -flax-vector-conversions -static -DVWIDTH=0 -DUPPERLIMIT=512 -mrvv-vector-bits=512 -Rpass=.*
     else
-        CFLAGS+= -flax-vector-conversions -static -DVWIDTH=32 -DUPPERLIMIT=512 -march=armv8.2-a+sve -msve-vector-bits=512 -Rpass=.*
+        CFLAGS+= -flax-vector-conversions -static -DVWIDTH=0 -DUPPERLIMIT=512 -march=armv8.2-a+sve -msve-vector-bits=512 -Rpass=.*
     endif
 endif
