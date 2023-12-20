@@ -960,7 +960,7 @@ do
                 break
             else
                 COUNTER=$((COUNTER+1))
-                if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+                if [[ $(uptime | awk '{print $11}' | cut -d "." -f 1) -ge 5 ]]; then
                     #Sleep to reduce host OS load and avoid hangs
                     sleep 2m
                 fi
@@ -1016,7 +1016,7 @@ do
         fi
 
         if [[ "$CHECK_HANGS" -eq 1 ]] || [[ "$ONLY_HANGS" -eq 1 ]]; then
-            if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+            if [[ $(uptime | awk '{print $11}' | cut -d "." -f 1) -ge 5 ]]; then
                 #Sleep to reduce host OS load and avoid hangs
                 sleep 2m
             fi
@@ -1037,7 +1037,7 @@ do
                 break
         else
                 COUNTER=$((COUNTER+1))
-                if [[ $(uptime | awk '{print $11}' | cut -d "," -f 1) -ge 5 ]]; then
+                if [[ $(uptime | awk '{print $11}' | cut -d "." -f 1) -ge 5 ]]; then
                     #Sleep to reduce host OS load and avoid hangs
                     sleep 2m
                 fi
