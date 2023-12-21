@@ -28,7 +28,7 @@ struct processorStruct* processorData;
 #define PE processorData[processorNumber]
 
 // Flags
-Bool removeDumpFiles = True;
+//Bool removeDumpFiles = True;
 
 //Trace Flags
 //~ Bool enablefunctionprofile  = True;
@@ -830,7 +830,11 @@ void createFaultInjectionReport() {
             opMemoryFlush(PE.memObj,0x0,0xFFFFFFFFF);/// flush the memory to avoid OVP dump format glitch
 
             /// memory dump files
-            sprintf(dumpName,"%s/%s/%s-%d-%d",MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_MEM_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            if(options.cleandumpfiles) {
+                sprintf(dumpName,"%s/%s/%s/%s-%d-%d",TMP_WORKSPACE,MACRO_APPLICATION_NAME,FOLDER_DUMPS,FILE_NAME_MEM_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            } else {
+                sprintf(dumpName,"%s/%s/%s-%d-%d",MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_MEM_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            }
             sprintf(goldName,"%s/%s/%s-%d",   MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_MEM_GOLD,0);
 
             /// dump File
@@ -898,7 +902,7 @@ void createFaultInjectionReport() {
             }
 
             /// remove dump file to reduce the HD footprint
-            if(removeDumpFiles) {
+            if(options.cleandumpfiles) {
                 sprintf(tempString,"rm %s",dumpName);
                 if( system(tempString) ) opMessage("I",PREFIX_FIM,"Command execution error (%s)\n",tempString);
             }
@@ -907,7 +911,11 @@ void createFaultInjectionReport() {
             //                                                  Test Reg Context                                                          //
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /// register final state comparison
-            sprintf(dumpName,"%s/%s/%s-%d-%d",MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_REG_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            if(options.cleandumpfiles) {
+                sprintf(dumpName,"%s/%s/%s/%s-%d-%d",TMP_WORKSPACE,MACRO_APPLICATION_NAME,FOLDER_DUMPS,FILE_NAME_REG_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            } else {
+                sprintf(dumpName,"%s/%s/%s-%d-%d",MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_REG_FAULT,processorNumber,MACRO_PLATFORM_ID);
+            }
             sprintf(goldName,"%s/%s/%s-%d",   MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,FILE_NAME_REG_GOLD,0);
 
             /// dump File
@@ -926,10 +934,10 @@ void createFaultInjectionReport() {
             pclose(filePointer);
 
             /// remove dump file to reduce the HD footprint
-            //~ if(removeDumpFiles) {
-                //~ sprintf(tempString,"rm %s",dumpName);
-                //~ if( system(tempString) ) opMessage("I",PREFIX_FIM,"Command execution error (%s)\n",tempString);
-            //~ }
+            if(options.cleandumpfiles) {
+                sprintf(tempString,"rm %s",dumpName);
+                if( system(tempString) ) opMessage("I",PREFIX_FIM,"Command execution error (%s)\n",tempString);
+            }
 
             if(strcmp(cmpReturn,"Null")==0)
                 regCmp = 0;

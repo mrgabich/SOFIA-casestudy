@@ -83,6 +83,8 @@ ihwaddclparg -name  linuxgraphics      -group userPlatformConfig -type boolvar  
 ihwaddclparg -name  arch               -group userPlatformConfig -type stringvar   -description "Specified architecture  -- @Review"
 ihwaddclparg -name  application        -group userPlatformConfig -type stringvar   -description "Application binary file -- @Review"
 ihwaddclparg -name  projectfolder      -group userPlatformConfig -type stringvar   -description "Project folder"
+ihwaddclparg -name  applicationname    -group userPlatformConfig -type stringvar   -description "Auxiliar application name"
+ihwaddclparg -name  cleandumpfiles     -group userPlatformConfig -type boolvar     -description "Enable the FI to remove fault dump files"
 ihwaddclparg -name  applicationfolder  -group userPlatformConfig -type stringvar   -description "Workspace folder"
 ihwaddclparg -name  mode               -group userPlatformConfig -type stringvar   -description "Mode Linux or Baremetal"
 ihwaddclparg -name  faultlist          -group userPlatformConfig -type stringvar   -description "File containing the fault list"

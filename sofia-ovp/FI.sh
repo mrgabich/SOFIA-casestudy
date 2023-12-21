@@ -203,7 +203,9 @@ function generateCheckpoints {
                 # Calculating the checkpoint size
                 echo "Checkpoint interval $CHECKPOINT_INTERVAL"
                 # Create the checkpoints
-                "$PLATFORM_FOLDER/harness/$CMD_OVP" "$SIM_ARGS" --goldrun --checkpointinterval "$CHECKPOINT_INTERVAL" --numberoffaults 1 --platformid 0 --applicationfolder "$WORKING_FOLDER" &> "./PlatformLogs/checkpoint_platform.$SUFIX_FIM_TEMP_FILES"
+                "$PLATFORM_FOLDER/harness/$CMD_OVP" "$SIM_ARGS" --goldrun --checkpointinterval "$CHECKPOINT_INTERVAL" \
+                                                                --numberoffaults 1 --platformid 0 --applicationfolder "$WORKING_FOLDER" \
+                                                                --applicationname "$CURRENT_APPLICATION" &> "./PlatformLogs/checkpoint_platform.$SUFIX_FIM_TEMP_FILES"
         fi
 }
 
@@ -230,6 +232,9 @@ function compileApplication {
         if [[ "$ONLY_HANGS" -eq 0 ]]; then
             # Create infrastructure folders
             mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling ./Traces
+        fi
+        if [[ "$USE_TMP_DUMPS" -eq 1 ]]; then
+            mkdir -p /tmp/SOFIA_workspace/${CURRENT_APPLICATION}/Dumps
         fi
         # New variable for arguments
         SIM_ARGS=
@@ -890,7 +895,7 @@ do
         fi
 
         # Setup gold command
-        GOLD_RUN="./$CMD_OVP $SIM_ARGS --platformid 0 --numberoffaults 1 --goldrun --applicationfolder $WORKING_FOLDER"
+        GOLD_RUN="./$CMD_OVP $SIM_ARGS --platformid 0 --numberoffaults 1 --goldrun --applicationfolder $WORKING_FOLDER --applicationname $CURRENT_APPLICATION"
 
         # Get time before running gold
         GOLD_EXEC=$SECONDS
@@ -993,10 +998,12 @@ do
         echo "Fault_Injection $((time/1000000000))" >> "$WORKSPACE/timing"
 
         SIM_ARGS="$SIM_ARGS --faultcampaignrun --checkpointinterval $CHECKPOINT_INTERVAL --numberoffaults $FAULTS_PER_PLATFORM"
-
+        if [[ "$USE_TMP_DUMPS" -eq 1 ]]; then
+            SIM_ARGS="$SIM_ARGS --cleandumpfiles"
+        fi
         echo "${GOLD_EXEC}" > timeOutTime
 
-        SIM_RUN="./$CMD_OVP $SIM_ARGS --applicationfolder $WORKING_FOLDER --platformid"
+        SIM_RUN="./$CMD_OVP $SIM_ARGS --applicationfolder $WORKING_FOLDER --applicationname $CURRENT_APPLICATION --platformid"
 
         # Time stamp for the fault injection
         sFaultCampaignBegin="$(date +%s%N)"
@@ -1029,7 +1036,9 @@ do
             #cat ./*reportfile
             cp -rf ./*reportfile "$WORKSPACE"
         fi
-
+        if [[ "$USE_TMP_DUMPS" -eq 1 ]]; then
+            rm /tmp/SOFIA_workspace -Rf
+        fi
         # Exit after N folders
         # Return to the applications folder
         cd "$APPLICATIONS_FOLDER" || exit

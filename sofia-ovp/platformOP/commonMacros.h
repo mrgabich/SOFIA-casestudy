@@ -16,6 +16,7 @@
 #define MACRO_CHECKPOINT_INTERVAL           options.checkpointinterval
 #define MACRO_PROJECT_FOLDER                options.projectfolder
 #define MACRO_APPLICATION_FOLDER            options.applicationfolder
+#define MACRO_APPLICATION_NAME              options.applicationname
 
 #define FIM_HANG_THRESHOLD 0.5
 
@@ -37,6 +38,7 @@
 
 #define FILE_NAME_REG_DUMP          "CHCK_DUMP"
 #define FILE_NAME_MEM_DUMP          "CHCK_DUMP"
+#define TMP_WORKSPACE               "/tmp/SOFIA_workspace"
 
 #define FOLDER_DUMPS                "Dumps"
 #define FOLDER_TRACES               "Traces"

@@ -28,6 +28,7 @@ struct optionsS {
     const char*          arch;
     const char*          application;
     const char*          projectfolder;
+    const char*          applicationname;
     const char*          applicationfolder;
     const char*          mode;
     const char*          faultlist;
@@ -43,6 +44,7 @@ struct optionsS {
     // Function Profile
     const char*          tracesymbol;
     const char*          tracevariable;
+    Bool                 cleandumpfiles;
     Bool                 enablefunctionprofile;
     Bool                 enablelinecoverage;
     Bool                 enableitrace;
