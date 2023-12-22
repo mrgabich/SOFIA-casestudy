@@ -35,10 +35,18 @@ NUMBER_OF_FAULTS=17000
 FAULTS_PER_PLATFORM=1
 NUMBER_OF_BITFLIPS=1
 SEQUENTIAL_BIT_FLIP=0
+
+: '
+Fault Campaign flags:
+CHECK_HANGS - Check all hangs that occurred on the platform in a second simulation round during the campaign.
+ONLY_HANGS - After the campaign runs, it only checks the hangs that occurred in a second simulation round (also enables CHECK_HANGS).
+USE_TMP_DUMPS - Operates on memory dumps and reg state in the tmp path to avoid load overhead.
+DEBUG_MODE - Enables debug mode with generation of all dumps, reports, and logs in the workspace.
+'
 CHECK_HANGS=0
 ONLY_HANGS=0
-USE_TMP_DUMPS=1
-
+USE_TMP_DUMPS=0
+DEBUG_MODE=1
 
 : '
 Generate a new fault list

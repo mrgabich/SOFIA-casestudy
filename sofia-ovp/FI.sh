@@ -805,6 +805,10 @@ configureOVP(){
         # Create script to init ovp
         python3 "${PROJECT_FOLDER}/initOvp.py" -l "${LICENSE}" -v "${IMPERAS_VERSION}" -p "${SIMULATOR_PATH}"
         source ovp.sh &>/dev/null
+        if [[ $DEBUG_MODE -eq 1 ]]; then
+            ONLY_HANGS=0
+            USE_TMP_DUMPS=0
+        fi
         if [[ $ONLY_HANGS -eq 1 ]]; then
             CHECK_HANGS=1
             GENERATE_FAULT_LIST=NO_GENERATION
@@ -1013,7 +1017,7 @@ do
 
         if [[ "$ONLY_HANGS" -eq 0 ]]; then
             # Execute the FI platform
-            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}"
+            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}" -d "${DEBUG_MODE}"
 
             # Execute fault harvest
             callHarvestLocal
@@ -1028,7 +1032,7 @@ do
                 sleep 2m
             fi
             # Execute the FI platform
-            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}" -e "${CHECK_HANGS}" 
+            python2 "${PROJECT_FOLDER}/submitJobs.py" -g "${GOLD_RUN}" -r "${SIM_RUN}" -w "${PARALLEL}" -f "${NUMBER_OF_FAULTS}" -a "${CURRENT_APPLICATION}" -c "${CLUSTER}" -e "${CHECK_HANGS}" -d "${DEBUG_MODE}"
 
        		# Execute fault harvest
             callHarvestLocal

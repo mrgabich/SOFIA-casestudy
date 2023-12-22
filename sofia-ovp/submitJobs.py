@@ -241,12 +241,15 @@ def goldTimeOut():
 #                                 HARNESS RUN                                 #
 ###############################################################################
 
-def runHarness(pid, application, execute, path, serverPath):
+def runHarness(pid, application, execute, path, serverPath, debug):
     space = " "
     hostname = getHostname()
     ovpFolder = serverPath[hostname]
     os.chdir(ovpFolder + "/workspace_"+hostname+"/" + application)
-    logfile = open('PlatformLogs/platform-' + str(pid), 'w+')
+    if (debug == 1):
+        logfile = open('PlatformLogs/platform-' + str(pid), 'w+')
+    else:
+        FNULL = open(os.devnull, 'w')
     path = path[:-1]
     ovpFolder = ovpFolder[:-1]
     echoExecuteCmd = "echo \"" + execute + "\""
@@ -261,7 +264,12 @@ def runHarness(pid, application, execute, path, serverPath):
     initOvp = "./ovp.sh"
     timeout = "timeout" + space + timeOutTime
     cmd = initOvp + space + timeout + space + run
-    subprocess.call(cmd, shell=True, stdout=logfile)
+    if (debug == 1):
+        subprocess.call(cmd, shell=True, stdout=logfile)
+        logfile.close()
+    else:
+        subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
+        FNULL.close()
 
 
 def run():
@@ -276,6 +284,7 @@ def run():
             args.runExecute,
             localPath,
             serverPath,
+            args.enableDebug,
         )
         subFunctions = (getHostname, getTimeoutTime, )
         libraries = ("subprocess", )
@@ -314,6 +323,7 @@ def runErrors(pids):
             args.runExecute,
             localPath,
             serverPath,
+            args.enableDebug,
         )
         subFunctions = (getHostname, getTimeoutTime, )
         libraries = ("subprocess", )
@@ -370,6 +380,7 @@ def checkHangs():
         shell=True)
     if os.path.isfile('./errors'):
         pids = readErrors("errors")
+        subprocess.call("rm errors", shell=True)
     return pids
 
 
@@ -484,6 +495,15 @@ def main():
         dest='cluster',
         required=True,
         help="pcs on cluster")
+
+    parser.add_argument(
+        '-d',
+        '--dbg',
+        action='store',
+        dest='enableDebug',
+        default=0,
+        type=int,
+        help="enable debug mode with logs")
 
     parser.add_argument(
         '-e',
