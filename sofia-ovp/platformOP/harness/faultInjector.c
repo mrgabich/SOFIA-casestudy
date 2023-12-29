@@ -156,6 +156,7 @@ void fimSimulate(struct optionsS _options, optModuleP _mi) {
                 MACRO_UPDATE_STOP_REASON(stopReason);
                 //Retrieve a processor
                 removeFromScheduler(processorNumber);
+                simulationFinished=True;
             }
         }
     }
@@ -1060,7 +1061,7 @@ void handlerFaultInjection(Uns32 processorNumber) {
     Uns64 memAddress;
     Uns8  memValue;
     // Uns64 regTemp=0x0;
-    char * vecRegTemp;
+    Uns8 * vecRegTemp;
 
     switch(PE.status) {
     case BEFORE_INJECTION: { /// inject the fault
@@ -1092,23 +1093,31 @@ void handlerFaultInjection(Uns32 processorNumber) {
 
         /// insert the fault
         if(MACRO_FAULTTYPE(TYPE_REGISTER) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE) || MACRO_FAULTTYPE(TYPE_FUNCTIONTRACE2)) { //Register faults
+            //sprintf(dumpName,"%s/%s/BOMB_DUMP-%d-%d",MACRO_APPLICATION_FOLDER,FOLDER_DUMPS,processorNumber,MACRO_PLATFORM_ID);
+            //opProcessorStateSaveFile(PE.processorObj,dumpName);
             // Acquire the register
-            vecRegTemp = malloc(sizeof(char) * (strlen(PE.vecFaultValue)/2));
+            int vec_size = (strlen(PE.vecFaultValue)/2);
+            vecRegTemp = malloc(sizeof(Uns8) * vec_size);
             opProcessorRegReadByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
             // Apply the mask
             char hexPairFault[3] = "00";
-            char hexPairReg[3] = "00";
-            uint8_t base, fault;
-            for (int i=0;i<strlen(PE.vecFaultValue);i+=2){
-                strncpy(hexPairFault, PE.vecFaultValue + i, 2);
+            Uns8 fault;
+            //for (int i=0;i<vec_size;i+=1){
+                //opPrintf("%02x",vecRegTemp[vec_size-i-1]);
+            //}
+            //opPrintf("\n");
+            for (int i=0;i<vec_size;i+=1){
+                strncpy(hexPairFault, PE.vecFaultValue + (i*2), 2);
                 hexPairFault[2] = '\0';
-                strncpy(hexPairReg, vecRegTemp + (i/2), 1);
-                hexPairReg[2] = '\0';
-                base = (uint8_t)(strtol(hexPairReg, NULL, 16));
-                fault = (uint8_t)(strtol(hexPairFault, NULL, 16));
-                base = ~(base ^ fault);
-                vecRegTemp[i/2] = (char) base;
+                fault = (Uns8)(strtol(hexPairFault, NULL, 16));
+                //opPrintf("%02x",fault);
+                vecRegTemp[vec_size-i-1] = ~(vecRegTemp[vec_size-i-1] ^ fault);
             }
+            //opPrintf("\n");
+            //for (int i=0;i<vec_size;i+=1){
+                //opPrintf("%02x",vecRegTemp[vec_size-i-1]);
+            //}
+            //opPrintf("\n");
             // Writeback register
             opProcessorRegWriteByName(PE.coreToInject,PE.faultRegister,vecRegTemp);
             free(vecRegTemp);

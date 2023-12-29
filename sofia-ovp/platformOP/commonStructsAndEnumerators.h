@@ -33,7 +33,7 @@ typedef struct processorStruct {
 
     /// fault mask
     Uns64  faultValue;
-    char vecFaultValue[(MAX_VECTOR_REG_WIDTH)];
+    char   vecFaultValue[MAX_VECTOR_REG_WIDTH];
     
     /// faulty register information
     char   faultRegister[STRING_SIZE];

@@ -77,7 +77,7 @@ function generateFaultList {
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --vectorbw $VECTOR_REG_BITWIDTH"
         fi
         # Not generating faults
-        if [[ $GENERATE_FAULT_LIST -eq $NO_FAULTS ]]; then
+        if [[ "$GENERATE_FAULT_LIST" -eq "NO_FAULTS" ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --nobitflip"
                 GENERATE_FAULT_LIST_DISTR=0 # Don't necessary
         fi
@@ -110,7 +110,7 @@ function generateFaultList2 {
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --traceinstance $FUNCTION_INSTANCE"
         fi
         # Not generating faults
-        if [[ "$GENERATE_FAULT_LIST" -eq "$NO_FAULTS" ]]; then
+        if [[ "$GENERATE_FAULT_LIST" -eq "NO_FAULTS" ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --dummy"
                 GENERATE_FAULT_LIST_DISTR=0 # Don't necessary
         fi
@@ -170,13 +170,13 @@ function generateFaultList2 {
         if [[ "$GENERATE_FAULT_LIST_DISTR" -eq 1 ]]; then
                 CMD_FAULT_LIST="$CMD_FAULT_LIST --eqdist"
         fi
-	# Flip sequential bits
-	if [[ "$SEQUENTIAL_BIT_FLIP" -eq 1 ]]; then
-		CMD_FAULT_LIST="$CMD_FAULT_LIST --seqflip"
-	fi
+        # Flip sequential bits
+        if [[ "$SEQUENTIAL_BIT_FLIP" -eq 1 ]]; then
+            CMD_FAULT_LIST="$CMD_FAULT_LIST --seqflip"
+        fi
 
         # Not generating new faults
-        if [[ "$GENERATE_FAULT_LIST" -ne "$NO_GENERATION" ]]; then
+        if [[ "$GENERATE_FAULT_LIST" -ne "NO_GENERATION" ]]; then
                 # Run the faultlist
                 # Check if app make was successful, if not exits the script
                 $CMD_FAULT_LIST || exit 1
@@ -220,7 +220,7 @@ function compileApplication {
         # Updated the application folder in the workspace
         if [[ ! -d "$WORKING_FOLDER" ]] && [[ "$ONLY_HANGS" -eq 1 ]]; then
                 echo "Application $CURRENT_APPLICATION FI campaign not exists, check the ONLY_HANGS parameter!" && exit
-        elif [[ "$ONLY_HANGS" -eq 0 ]]; then
+        elif [[ "$ONLY_HANGS" -eq 0 ]] && [[ "$GENERATE_FAULT_LIST" -ne "NO_GENERATION" ]]; then
             rm -rf "$WORKING_FOLDER"
         fi
         rsync -qavR --exclude="$CURRENT_APPLICATION/Data" "$CURRENT_APPLICATION" "$WORKSPACE"
