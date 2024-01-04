@@ -4,6 +4,7 @@
 DEFAULT_KERNEL_VERSION="v5.15"
 DEFAULT_GIT_REPOSITORY="git@github.com:torvalds/linux.git"
 DEFAULT_ARCH="arm64"
+DEFAULT_OUTPUT_DIR="output"
 
 # Display usage message
 usage() {
@@ -19,6 +20,7 @@ usage() {
 KERNEL_VERSION="$DEFAULT_KERNEL_VERSION"
 GIT_REPOSITORY="$DEFAULT_GIT_REPOSITORY"
 ARCH="$DEFAULT_ARCH"
+OUTPUT_DIR="$DEFAULT_OUTPUT_DIR"
 
 # Check if the specified directory exists, change to it or create it
 TARGET_DIR="$HOME/development/inesc"
@@ -103,23 +105,34 @@ echo "Compiling the kernel in: $(pwd)"
 
 # Configure the kernel for the specified architecture
 make ARCH="$ARCH" defconfig
-
+#ARCH=arm64 scripts/kconfig/merge_config.sh \
+		#linaro/configs/linaro-base.conf \
+		#linaro/configs/linaro-base64.conf \
+		#linaro/configs/distribution.conf \
+		#linaro/configs/vexpress64.conf \
+		#linaro/configs/kvm-host.conf \
+		#linaro/configs/kvm-guest.conf
 # Compile the kernel
-make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+#make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- CONFIG_DEBUG_INFO=1 all -j$(nproc)
+#make ARCH="$ARCH" CROSS_COMPILE=/soft64/cross/gcc/arm_gcc_linux_aarch64_12.3/bin/aarch64-none-linux-gnu- CONFIG_DEBUG_INFO=1 all -j$(nproc)
+make ARCH="$ARCH" CROSS_COMPILE=/soft64/cross/gcc/arm_gcc_linux_aarch64_12.3/bin/aarch64-none-linux-gnu- CONFIG_DEBUG_INFO=1 Image -j$(nproc)
+make ARCH="$ARCH" CROSS_COMPILE=/soft64/cross/gcc/arm_gcc_linux_aarch64_12.3/bin/aarch64-none-linux-gnu- CONFIG_DEBUG_INFO=1 dtbs -j$(nproc)
 
 # Generate additional files
-make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- Image.defconfig
-make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- vmlinux.defconfig
-make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- foundation-v8-gicv3.dtb
-make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- foundation-v8.dtb
+#make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- Image.defconfig
+#make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- vmlinux.defconfig
+#make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- foundation-v8-gicv3.dtb
+#make ARCH="$ARCH" CROSS_COMPILE=aarch64-linux-gnu- foundation-v8.dtb
 
 # Placeholder comment - Add commands to generate initrd.arm64.img if needed
 # Example: Replace the following line with the actual command to generate initrd.arm64.img
 # mkinitramfs -o "$OUTPUT_DIR/initrd.arm64.img" <additional options>
 
 # Move generated files to the output directory
-mv -t "$OUTPUT_DIR" arch/"$ARCH"/boot/Image arch/"$ARCH"/boot/Image.defconfig vmlinux.defconfig arch/"$ARCH"/boot/foundation-v8-gicv3.dtb arch/"$ARCH"/boot/foundation-v8.dtb
+mv -t "$OUTPUT_DIR" arch/"$ARCH"/boot/Image arch/"$ARCH"/boot/Image.defconfig vmlinux vmlinux.defconfig arch/"$ARCH"/boot/dts/arm/foundation-v8-gicv3.dtb arch/"$ARCH"/boot/dts/arm/foundation-v8.dtb
 # Add command to move initrd.arm64.img if needed
+cp -Rf $OUTPUT_DIR/vmlinux $OUTPUT_DIR/vmlinux.defconfig
+cp -Rf $OUTPUT_DIR/Image $OUTPUT_DIR/Image.defconfig
 
 # Display the path where the files were generated
 echo "Compilation completed. Generated files moved to: $(pwd)/$OUTPUT_DIR"

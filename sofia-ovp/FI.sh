@@ -607,7 +607,7 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --objfilenoentry $LINUX_BOOTLOADER"
 
                                         ;; # End ARM_CORTEX_A9
-                                ARM_CORTEX_A53 | ARM_CORTEX_A57 | ARM_CORTEX_A72 | ARM_CORTEX_AARCH64)
+                                ARM_CORTEX_A53 | ARM_CORTEX_A57 | ARM_CORTEX_A72 | ARM_CORTEX_A75 | ARM_CORTEX_AARCH64)
                                         # Environment
                                         export ENVIRONMENT=ovparmv8
 
@@ -634,7 +634,7 @@ function configureCommands {
                                         #~ export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
 
                                         # The arm A72 requires a different dtb
-                                        if [ "$ARCHITECTURE" = "ARM_CORTEX_A72" ] | [ "$ARCHITECTURE" = "ARM_CORTEX_AARCH64" ]; then
+                                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]] || [[ "$ARCHITECTURE" = "ARM_CORTEX_A75" ]] || [[ "$ARCHITECTURE" = "ARM_CORTEX_AARCH64" ]]; then
                                                 export LINUX_DTB=foundation-v8-gicv3.dtb # Dtb files
                                         else
                                                 export LINUX_DTB=foundation-v8.dtb # Dtb files
@@ -646,6 +646,8 @@ function configureCommands {
                                                 ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
                                                 ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
                                                 ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
+                                                ARM_CORTEX_A75) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75"; 
+                                                                    CMD_OVP="$CMD_OVP --override override_AA64PFR0_EL1=0x111112222 --override SVEImplementedSizes=0xf --override SVEFaultUnknown=0xdfdfdfdfdfdfdfdf";;
                                                 ARM_CORTEX_AARCH64) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75"; 
                                                                     CMD_OVP="$CMD_OVP --override override_AA64PFR0_EL1=0x111112222 --override SVEImplementedSizes=0xf --override SVEFaultUnknown=0xdfdfdfdfdfdfdfdf";;
                                         esac
@@ -916,6 +918,7 @@ do
         # Check if the gold run was successful, if not exits the script
         echo "$GOLD_RUN"
         if [[ $ENABLE_TRACE -eq 1 ]]; then
+                #$GOLD_RUN_TRACE || exit
                 if [[ $ENABLE_TRACE_INSTRUCTIONS -eq 1 ]]; then
                         $GOLD_RUN_TRACE | sed 's/  */ /gp' \
                         | sed "/Info 'FIM\/DUT0\/cpu0/!d" \
@@ -980,7 +983,7 @@ do
         # Get run time of gold execution
         GOLD_EXEC=$((SECONDS - GOLD_EXEC))
 
-        GOLD_EXEC=$(((GOLD_EXEC+1)*4))
+        GOLD_EXEC=$(((GOLD_EXEC+1)*3))
 
         # Create the checkpoints when required
         generateCheckpoints
