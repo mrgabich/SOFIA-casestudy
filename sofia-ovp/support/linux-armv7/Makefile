@@ -50,16 +50,16 @@ EXE=app.$(CROSS).elf
 
 V=
 
-all: cleanObj print $(EXE) cleanObj 
+all: cleanObj print $(EXE) cleanObj
 
 print::
 	@    echo "Print $(INCOBJ) - $(SRC)"
-	
+
 $(EXE): $(INCOBJ)
 	@    echo "# Linking $(CROSS) $@"
 	@    echo $(INCOBJ)
 	$(V) $(ARM_CORTEX_A9_LINKXX) -o $@ $^ $(ARM_CORTEX_A9_LDFLAGS) $(ARM_CORTEX_A9_LDFLAGS0)
-	$(V) $(ARM_CORTEX_A9_OBJDUMP) -d $@ > app.FIM_log.lst
+	$(V) $(ARM_CORTEX_A9_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $@ > app.FIM_log.lst
 	$(V) rm -f *.o
 
 %$(MULT).$(CROSS).o: %.cpp
@@ -68,7 +68,7 @@ $(EXE): $(INCOBJ)
 
 %$(MULT).$(CROSS).o: %.c
 	@    echo "# Compiling $(CROSS) $<"
-	$(V) $(ARM_CORTEX_A9_CC) -c -o $@ $< -D$(CROSS) $(DEF) $(OPTIMISATION) 
+	$(V) $(ARM_CORTEX_A9_CC) -c -o $@ $< -D$(CROSS) $(DEF) $(OPTIMISATION)
 
 cleanObj:
 	@    echo "# Clean"
@@ -76,5 +76,5 @@ cleanObj:
 
 clean:
 	- rm -f *.$(CROSS).elf *.$(CROSS).o
-	
+
 endif

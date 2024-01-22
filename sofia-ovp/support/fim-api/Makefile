@@ -6,14 +6,14 @@ VERBOSE=1
 OVP_INCLUDES=-I.
 OPTIMISATION?=-O0 -g
 
-ARM_CORTEX_A9_CROSSCOMPILER   = /usr
-ARM_CORTEX_A9_PREFIX=arm-linux-gnueabi
+ARM_CORTEX_A9_CROSSCOMPILER   = /soft64/cross/gcc/arm_gcc_linux_11.3
+ARM_CORTEX_A9_PREFIX=arm-none-linux-gnueabihf
 
-ARM_CORTEX_A9_CFLAGS   = -mcpu=cortex-a9 -march=armv7-a -mlittle-endian -static -DUNIX -Wl,-Ttext=0x2FAFAFAF
+ARM_CORTEX_A9_CFLAGS   = -mcpu=cortex-a9 -march=armv7-a+fp -mlittle-endian -static -DUNIX -Wl,-Ttext=0x2FAFAFAF
 ARM_CORTEX_A9_CC       = $(ARM_CORTEX_A9_CROSSCOMPILER)/bin/$(ARM_CORTEX_A9_PREFIX)-gcc $(ARM_CORTEX_A9_CFLAGS) -DARM_CORTEX_A9 $(OPTIMISATION) $(OVP_INCLUDES)
 ARM_CORTEX_A9_OBJDUMP  = $(ARM_CORTEX_A9_CROSSCOMPILER)/bin/$(ARM_CORTEX_A9_PREFIX)-objdump
 
-ARM_CORTEX_A72_CROSSCOMPILER   = /usr
+ARM_CORTEX_A72_CROSSCOMPILER   = /usr/gcc-11-aarch64-linux-gnu
 ARM_CORTEX_A72_PREFIX=aarch64-linux-gnu
 
 ARM_CORTEX_A72_CFLAGS   = -mcpu=cortex-a53 -march=armv8-a -mlittle-endian -static -DUNIX -Wl,-Ttext=0x08000000 

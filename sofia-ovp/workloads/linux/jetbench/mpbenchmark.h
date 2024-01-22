@@ -1,10 +1,10 @@
-#include<stdio.h>
-#include<stdlib.h>
+//#include<stdio.h>
+//#include<stdlib.h>
 #include<omp.h>
 
 int main();
 void InitializeArray();
-void printResult();
+//void printResult();
 double deg2rad(double deg,double pi);
 double sqroot(double numb1er);
 double fabs(double x);
@@ -39,7 +39,7 @@ const double dburner = 515.2;
 const double dturbin = 515.2;
 const double dnozl = 515.2;
 // arrays, store input and output data
-const double inputArray[48][48]= {
+const double inputArray[1][1]= {
             {0, 0, 90, 0.05},
 			{100, 0, 90, 0.05},
 			{200, 1000, 90, 0.05},
@@ -87,8 +87,9 @@ const double inputArray[48][48]= {
 			{195, 3000, 50, 0.05},
 			{180, 2000, 50, 0.05},
 			{165, 1000, 50, 0.05},
-			{150, 0, 50, 0.05}};
-double outputArray[48][18]={0};
+			{150, 0, 50, 0.05}
+			};
+double outputArray[48][48]={0};
 
 int LineCount = 48;
 int NumPoints = 0, NumMissed = 0;

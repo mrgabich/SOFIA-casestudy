@@ -425,17 +425,17 @@ int main(int argc,char *argv[])
 
 					// weight calculation
 					if (engine == 1) {
-						//printf("Engine 1: %d", engine);
+						printf("Engine 1: %d", engine);
 						weight = .12754 * sqroot(acore * acore * acore)
 								* (dcomp * lcomp + dburner * lburn + dturbin * lturb + dnozl * lnoz);
 					}
 					if (engine == 2) {
-						//printf("Engine 3: %d", engine);
+						printf("Engine 2: %d", engine);
 						weight = .08533 * sqroot(acore * acore * acore)
 								* (dcomp * lcomp + dburner * lburn + dturbin * lturb + dnozl * lnoz);
 					}
 					if (engine == 3) {
-						//printf("Engine 3: %d", engine);
+						printf("Engine 3: %d", engine);
 						weight = .08955
 								* acore
 								* ((1.0 + byprat) * dfan * 4.0 + dcomp * (ncomp - 3) + dburner + dturbin * nturb + dburner * 2.0)
@@ -494,13 +494,13 @@ int main(int argc,char *argv[])
 
 	}//end of parallel
 	BenchmarEndTime = omp_get_wtime();
-	//printResult();
+	printResult();
 
 	//FIM
     FIM_exit();
 	return 0;
 }
-/*
+
 void printResult(){
 	// header for results
 	
@@ -522,7 +522,7 @@ void printResult(){
 	printf("%f\n", benchmarkTotalTime);
 
 }
-*/
+
 
 /* Utility to convert degree in radian */
 double deg2rad(double deg,double pi)

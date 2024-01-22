@@ -22,7 +22,7 @@ all: $(EXE)
 %$(MULT).$(CROSS).elf: %$(MULT).$(CROSS).o $(INCOBJ)
 	@    echo "# Linking $(CROSS) $@"
 	$(V) $(IMPERAS_LINK) -o $@ $^ $(IMPERAS_LDFLAGS) -lm -lc  $(CFLAGS)
-	$(V) $(IMPERAS_OBJDUMP) -d $@ > app.FIM_log.lst
+	$(V) $(IMPERAS_OBJDUMP) --disassemble-all -j .text -j .init -j .fini -j .rodata -j .data -j .bss -j .heap -j .comment -D $@ > app.FIM_log.lst
 
 %$(MULT).$(CROSS).o: %.c
 	@    echo "# Compiling $(CROSS) $<"

@@ -659,7 +659,7 @@ function configureCommands {
 
                         # Flags to export to the Makefile
                         export NUM_THREADS="$NUM_CORES"
-                        export MAKEFILE_CFLAGS="-O3 -g -w -gdwarf-2 -mcpu=$MPUFLAG -mlittle-endian -DUNIX -static -I$OVP_FIM -D$ENVIRONMENT -DOPEN -DNUM_THREAD=4 -fopenmp -pthread"
+                        export MAKEFILE_CFLAGS="-O3 -g -w -gdwarf-2 -mcpu=$MPUFLAG -mlittle-endian -DUNIX -static -I$OVP_FIM -D$ENVIRONMENT -DOPEN -DNUM_THREAD=1 -fopenmp -pthread"
                         export MAKEFILE_FLINKFLAGS="-static -fopenmp -I$OVP_FIM -D$ENVIRONMENT -lm -lstdc++"
 
                         # Check if the OVPFIM run time caller is compiled

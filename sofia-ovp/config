@@ -9,8 +9,7 @@ ARM_CORTEX_A5, ARM_CORTEX_A7, ARM_CORTEX_A8, ARM_CORTEX_A9,
 ARM_CORTEX_A53, ARM_CORTEX_A57, ARM_CORTEX_A72,
 RISCV32I, RISCV32IM, RISCV32IMAC, RISCV32GC,
 RISCV64IMAC, RISCV64GC'
-ARCHITECTURE=ARM_CORTEX_M7
-
+ARCHITECTURE=ARM_CORTEX_A9
 
 : '
 Number of TARGET cores
@@ -55,12 +54,13 @@ Registers to create/inject faults - leave empty for all registers
 Int r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,sp,lr,pc
 Float d0-d15
 # For Aarch64
-Int x0-x30,sp,pc
+Int x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,sp,pc
 Float v0-v31
 # For RISCV
 Int ra,sp,gp,tp,t0,t1,t2,s0,s1,a0,a1,a2,a3,a4,a5,a6,a7,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,t3,t4,t5,t6,pc
 '
 REG_LIST=r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,sp,lr,pc
+#x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,sp,pc
 
 
 : '
@@ -109,7 +109,7 @@ Workload selection
 WORKLOAD_BAREMETAL - bare metal apps
 WORKLOAD_LINUX - Linux apps
 '
-WORKLOAD_TYPE=WORKLOAD_BAREMETAL
+WORKLOAD_TYPE=WORKLOAD_LINUX
 
 
 : '
@@ -132,7 +132,7 @@ LI_OPTIONS=LI_USE_CLEAN
 : '
 Execute only gold simulation
 '
-ONLY_GOLD=0
+ONLY_GOLD=1
 
 
 : '
@@ -183,7 +183,7 @@ CLUSTER=NONE
 : '
 #License server name
 '
-LICENSE=localhost
+LICENSE=hades
 
 
 : '
@@ -210,8 +210,9 @@ export RISCV_TOOLCHAIN_BAREMETAL_PREFIX=riscv-none-elf
 
 # Linux
 ## Aarch32
-export ARM_TOOLCHAIN_LINUX=/usr
-export ARM_TOOLCHAIN_LINUX_PREFIX=arm-linux-gnueabi
+export ARM_TOOLCHAIN_LINUX=/soft64/cross/gcc/linaro_gcc_linux_11.3
+export ARM_TOOLCHAIN_LINUX_PREFIX=arm-linux-gnueabihf
+
 ## Aarch64
-export AARCH64_TOOLCHAIN_LINUX=/usr
+export AARCH64_TOOLCHAIN_LINUX=/soft64/cross/gcc/linaro_gcc_linux_aarch64_11.3
 export AARCH64_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu

@@ -25,11 +25,11 @@ sudo apt-get --force-yes -y install g++-multilib
 #sudo apt-get --force-yes -y install g++-arm-linux-gnueabi
 
 # Armv7 baremetal
-sudo apt-get --force-yes -y install gcc-arm-none-eabi
+#sudo apt-get --force-yes -y install gcc-arm-none-eabi
 
 # Armv8 C
-#sudo apt-get --force-yes -y install gcc-aarch64-linux-gnu
-#sudo apt-get --force-yes -y install g++-aarch64-linux-gnu
+sudo apt-get --force-yes -y install gcc-aarch64-linux-gnu
+sudo apt-get --force-yes -y install g++-aarch64-linux-gnu
 
 # Armv7 Fortran
 #sudo apt-get --force-yes -y install gfortran-arm-linux-gnueabi
@@ -38,15 +38,15 @@ sudo apt-get --force-yes -y install gcc-arm-none-eabi
 #sudo apt-get --force-yes -y install gfortran-aarch64-linux-gnu
 
 #Python
-sudo apt-get --force-yes -y install python-dev
-sudo apt-get --force-yes -y install python-setuptools
+#sudo apt-get --force-yes -y install python-dev
+#sudo apt-get --force-yes -y install python-setuptools
 #~ sudo apt-get --force-yes -y install python-matplotlib
-sudo apt-get --force-yes -y install python-enum34
-sudo apt-get --force-yes -y install python-scipy
-sudo apt-get --force-yes -y install python-numpy
-sudo apt-get --force-yes -y install python-pip
-sudo apt-get --force-yes -y install python-tk
-pip install matplotlib==1.5.3
-pip install --upgrade pip
-sudo apt-get install python3-pip
-pip2 install --user pp
+#sudo apt-get --force-yes -y install python-enum34
+#sudo apt-get --force-yes -y install python-scipy
+#sudo apt-get --force-yes -y install python-numpy
+#sudo apt-get --force-yes -y install python-pip
+#sudo apt-get --force-yes -y install python-tk
+#pip install matplotlib==1.5.3
+#pip install --upgrade pip
+#sudo apt-get install python3-pip
+#pip2 install --user pp

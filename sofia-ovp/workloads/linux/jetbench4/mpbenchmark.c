@@ -99,28 +99,28 @@ int main(int argc,char *argv[])
 					c = inputArray[index][2];
 					d = inputArray[index][3];
 					if (a < 0 || a > 1500) {
-						printf("Warning : incorrect speed for point %d\n", CurrentPoint);
+						//printf("Warning : incorrect speed for point %d\n", CurrentPoint);
 						u0d = 0;
 					} else
 						// Input speed in mph
 						u0d = a;
 
 					if (b < 0 || b > 50000) {
-						printf("Warning : incorrect altitude for point %d\n", CurrentPoint);
+						//printf("Warning : incorrect altitude for point %d\n", CurrentPoint);
 						altd = 0;
 					} else
 						// Input altitude in feet
 						altd = b;
 
 					if (c < 45 || c > 90) {
-						printf("Warning : incorrect throttle for point %d\n", CurrentPoint);
+						//printf("Warning : incorrect throttle for point %d\n", CurrentPoint);
 						throtl = 100;
 					} else
 						// Converting input throttle in %
 						throtl = deg2rad(c, pi) * 100 * 2 / pi;
 
 					if (d < 0) {
-						printf("Warning : incorrect deadline for point %d\n", CurrentPoint);
+						//printf("Warning : incorrect deadline for point %d\n", CurrentPoint);
 						TimePoint = 0;
 					} else {
 						// Input time point
@@ -425,14 +425,17 @@ int main(int argc,char *argv[])
 
 					// weight calculation
 					if (engine == 1) {
+						//printf("Engine 1: %d", engine);
 						weight = .12754 * sqroot(acore * acore * acore)
 								* (dcomp * lcomp + dburner * lburn + dturbin * lturb + dnozl * lnoz);
 					}
 					if (engine == 2) {
+						//printf("Engine 2: %d", engine);
 						weight = .08533 * sqroot(acore * acore * acore)
 								* (dcomp * lcomp + dburner * lburn + dturbin * lturb + dnozl * lnoz);
 					}
 					if (engine == 3) {
+						//printf("Engine 3: %d", engine);
 						weight = .08955
 								* acore
 								* ((1.0 + byprat) * dfan * 4.0 + dcomp * (ncomp - 3) + dburner + dturbin * nturb + dburner * 2.0)
@@ -497,7 +500,7 @@ int main(int argc,char *argv[])
     FIM_exit();
 	return 0;
 }
-
+/*
 void printResult(){
 	// header for results
 	
@@ -519,7 +522,7 @@ void printResult(){
 	printf("%f\n", benchmarkTotalTime);
 
 }
-
+*/
 
 /* Utility to convert degree in radian */
 double deg2rad(double deg,double pi)
@@ -625,7 +628,7 @@ double fpow(double x, double y) {
 	int partieEntiere = (int) y;
 	// If x<0 and y not integer
 	if (x < 0 && (double) partieEntiere != y) {
-		printf("error power undefined\n");
+		//printf("error power undefined\n");
 		return 0;
 	}
 	// If x<0 and y integer
@@ -637,7 +640,7 @@ double fpow(double x, double y) {
 double sqroot(double number) {
 	double x0, x, prec = 1;
 	if (number < 0) {
-		printf("error sqroot\n");
+		//printf("error sqroot\n");
 		return (0);
 	}
 
@@ -662,7 +665,7 @@ double log(double x) {
 	double coeff = -1;
 	int i = 1;
 	if (x <= 0) {
-		printf("error log undefined\n");
+		//printf("error log undefined\n");
 		return 0;
 	}
 
