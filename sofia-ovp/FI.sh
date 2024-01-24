@@ -36,18 +36,32 @@ function callHarvestLocal {
         echo "**************************************************************"
         echo "Fault harvest"
         echo "**************************************************************"
-
         # Call fault harvest to generate final report file
-        $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
+        if [[ -n "$OUTPUTDATA" ]] && [[ -f "$WORKING_FOLDER/Traces/GOLD_TRACE-0" ]]; then
+                $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
                            --numberoffaults "$FAULTS_PER_PLATFORM" \
                            --application "$CURRENT_APPLICATION" \
                            --executiontime "$nsFaultCampaignBegin" \
                            --cores "$NUM_CORES" --cputype "$CPU_TYPE" \
-                           --environment "$ENVIRONMENT"
+                           --environment "$ENVIRONMENT" \
+                           --outputdata         $OUTPUTDATA \
+                           --outputdatasize     $OUTPUTDATA_SIZE \
+                           --outputdataoffset   $OUTPUTDATA_OFFSET
+        else
+                $CMD_FAULT_HARVEST --parallelexecutions "$NUMBER_OF_FAULTS" \
+                           --numberoffaults "$FAULTS_PER_PLATFORM" \
+                           --application "$CURRENT_APPLICATION" \
+                           --executiontime "$nsFaultCampaignBegin" \
+                           --cores "$NUM_CORES" --cputype "$CPU_TYPE" \
+                           --environment "$ENVIRONMENT" 
+        fi
+        $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
+                           --groupsdac --application $CURRENT_APPLICATION
 
         $CMD_FAULT_GRAPHIC --replotfile $CURRENT_APPLICATION.${ENVIRONMENT}.reportfile \
-                           --groupsdac
-
+                           --groupsnn --application $CURRENT_APPLICATION
+        #Remove trace files
+        rm -Rf $WORKING_FOLDER/Traces/*
 }
 
 function generateFaultList {
@@ -192,8 +206,12 @@ function compileApplication {
         if [[ ! -d "$CURRENT_APPLICATION" ]]; then
                 echo "Application $CURRENT_APPLICATION does not recognized for this workload" && exit
         fi
-        # Updated the application folder in the workspace
-        rm -rf "$WORKING_FOLDER"
+               # Updated the application folder in the workspace
+        if [[ ! -d "$WORKING_FOLDER" ]] && [[ "$ONLY_HANGS" -eq 1 ]]; then
+                echo "Application $CURRENT_APPLICATION FI campaign not exists, check the ONLY_HANGS parameter!" && exit
+        elif [[ "$ONLY_HANGS" -eq 0 ]] && [[ "$GENERATE_FAULT_LIST" -ne "NO_GENERATION" ]]; then
+            rm -rf "$WORKING_FOLDER"
+        fi
         rsync -qavR --exclude="$CURRENT_APPLICATION/Data" "$CURRENT_APPLICATION" "$WORKSPACE"
         # Enter in the application folder in the workspace
         cd "$WORKING_FOLDER" || exit
@@ -201,7 +219,7 @@ function compileApplication {
         cp -rf "$PLATFORM_FOLDER/harness/harness.$IMPERAS_ARCH.exe" .
 
         # Create infrastructure folders
-        mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling
+        mkdir -p ./Dumps ./Checkpoints ./Reports ./PlatformLogs ./Profiling ./Traces
         # New variable for arguments
         SIM_ARGS=
         # In some makefile is definied CROSS
@@ -543,8 +561,8 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --mode linux --startaddress 0x60000000 --arch multicore"
 
                                         case "$ARCHITECTURE" in
-                                                ARM_CORTEX_A9) CPU_VARIANT=Cortex-A9MPx$NUM_CORES; MPUFLAG="cortex-a9";;
-                                                ARM_CORTEX_A7) CPU_VARIANT=Cortex-A7MPx$NUM_CORES; MPUFLAG="cortex-a7";;
+                                                ARM_CORTEX_A9) export CPU_VARIANT=Cortex-A9MPx$NUM_CORES; MPUFLAG="cortex-a9";;
+                                                ARM_CORTEX_A7) export CPU_VARIANT=Cortex-A7MPx$NUM_CORES; MPUFLAG="cortex-a7";;
                                         esac
 
                                         # Define the workload path
@@ -589,7 +607,7 @@ function configureCommands {
                                         #~ export ARM_TOOLCHAIN_LINUX_PREFIX=aarch64-linux-gnu
 
                                         # The arm A72 requires a different dtb
-                                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]]; then
+                                        if [[ "$ARCHITECTURE" = "ARM_CORTEX_A72" ]] || [[ "$ARCHITECTURE" = "ARM_CORTEX_A75" ]] || [[ "$ARCHITECTURE" = "ARM_CORTEX_AARCH64" ]]; then
                                                 export LINUX_DTB=foundation-v8-gicv3.dtb # Dtb files
                                         else
                                                 export LINUX_DTB=foundation-v8.dtb # Dtb files
@@ -598,9 +616,13 @@ function configureCommands {
                                         CMD_OVP="$CMD_OVP --mode linux64 --linuxdtb $LINUX_DTB --startaddress 0x80000000 --arch multicore"
 
                                         case "$ARCHITECTURE" in
-                                                ARM_CORTEX_A53) CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
-                                                ARM_CORTEX_A57) CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
-                                                ARM_CORTEX_A72) CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
+                                                ARM_CORTEX_A53) export CPU_VARIANT=Cortex-A53MPx$NUM_CORES; MPUFLAG="cortex-a53";;
+                                                ARM_CORTEX_A57) export CPU_VARIANT=Cortex-A57MPx$NUM_CORES; MPUFLAG="cortex-a57";;
+                                                ARM_CORTEX_A72) export CPU_VARIANT=Cortex-A72MPx$NUM_CORES; MPUFLAG="cortex-a72";;
+                                                ARM_CORTEX_A75) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75"; 
+                                                                    CMD_OVP="$CMD_OVP --override override_AA64PFR0_EL1=0x111112222 --override SVEImplementedSizes=0xf --override SVEFaultUnknown=0xdfdfdfdfdfdfdfdf";;
+                                                ARM_CORTEX_AARCH64) export CPU_VARIANT=Cortex-A75MPx$NUM_CORES; MPUFLAG="cortex-a75"; 
+                                                                    CMD_OVP="$CMD_OVP --override override_AA64PFR0_EL1=0x111112222 --override SVEImplementedSizes=0xf --override SVEFaultUnknown=0xdfdfdfdfdfdfdfdf";;
                                         esac
 
                                         # Define the workload path
@@ -787,6 +809,10 @@ do
         # SIM_ARGS+=" --tracesymbol p --override FIM/DUT0/eth0/tapDevice=tap0 "
         if [[ -n "$SYMBOL" ]]; then
                 SIM_ARGS+=" --tracesymbol $SYMBOL"
+        fi
+        if [[ -n "$OUTPUTDATA" ]]; then
+                echo "Output data: $OUTPUTDATA"
+                SIM_ARGS+=" --tracevariable $OUTPUTDATA"
         fi
 
         # Setup gold command

@@ -94,7 +94,7 @@ def init():
 def getTimeoutTime():
     f = open("timeOutTime", "r")
     timeOut = int(f.read())
-    return timeOut if timeOut > 0 else 10
+    return int(timeOut) if int(timeOut) > 0 else 10
 
 ###############################################################################
 #                   DEFINE SERVERS & NETWORK COMMUNICATION                    #
@@ -267,6 +267,7 @@ def runHarness(pid, application, execute, path, serverPath):
 def run():
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
+    running=0
     for pid in range(1, args.nFaults + 1):
         function = runHarness
         functionArgs = (
@@ -284,10 +285,15 @@ def run():
                 functionArgs,
                 subFunctions,
                 libraries))
-        if len(ppservers) == 0:
-            #time.sleep(random.randint(5, 25))
-            # ~ time.sleep(1)
-            time.sleep(.2)
+        running+=1
+        if len(ppservers) == 0 and running == args.localWorkers:
+            running=0
+            # Define sleep for set of threads and avoid load interference
+            #chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
+            #if (int(subprocess.check_output(chkload, shell=True)) >= 10):
+               # time.sleep(120)
+            #else:
+            time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 
@@ -299,6 +305,7 @@ def run():
 def runErrors(pids):
     job_server = pp.Server(args.localWorkers, ppservers=ppservers)
     jobs = []
+    running=0
     for pid in pids:
         function = runHarness
         functionArgs = (
@@ -316,7 +323,15 @@ def runErrors(pids):
                 functionArgs,
                 subFunctions,
                 libraries))
-
+        running+=1
+        if len(ppservers) == 0 and running == args.localWorkers:
+            running=0
+            # Define sleep for set of threads and avoid load interference
+            chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
+            if (int(subprocess.check_output(chkload, shell=True)) >= 10):
+                time.sleep(120)
+            else:
+                time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 

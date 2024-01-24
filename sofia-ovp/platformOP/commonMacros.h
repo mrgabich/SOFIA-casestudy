@@ -27,8 +27,10 @@
 
 #define FILE_NAME_MEM_FAULT         "FAULT_MEM"
 #define FILE_NAME_REG_FAULT         "FAULT_REG"
+#define FILE_NAME_TRACE_FAULT       "FAULT_TRACE"
 #define FILE_NAME_MEM_GOLD          "GOLD_MEM"
 #define FILE_NAME_REG_GOLD          "GOLD_REG"
+#define FILE_NAME_TRACE_GOLD        "GOLD_TRACE"
 
 #define FILE_NAME_REG_CHECKPOINT    "CHCK_REG"
 #define FILE_NAME_MEM_CHECKPOINT    "CHCK_MEM"
@@ -37,6 +39,7 @@
 #define FILE_NAME_MEM_DUMP          "CHCK_DUMP"
 
 #define FOLDER_DUMPS                "Dumps"
+#define FOLDER_TRACES               "Traces"
 #define FOLDER_CHECKPOINTS          "Checkpoints"
 #define FOLDER_REPORTS              "Reports"
 

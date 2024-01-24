@@ -202,8 +202,13 @@ static VMI_MEM_WATCH_FN(traceVariableCB) {
 void getSymbolValue(vmiProcessorP processor, const char* symbolName, void* buffer) {
     memDomainP  dataDomain = vmirtGetProcessorDataDomain(processor); /// data domain
 
-    /// get the function symbol
-    vmiSymbolCP funcSymbol = vmirtGetSymbolByName(vmirtGetSMPParent(processor), symbolName);
+      /// get the function symbol
+    vmiSymbolCP funcSymbol;
+    if(vmirtGetSMPParent(processor) != NULL) {
+        funcSymbol = vmirtGetSymbolByName(vmirtGetSMPParent(processor), symbolName);
+    } else {
+        funcSymbol = vmirtGetSymbolByName(processor, symbolName);
+    }
     Addr funcAddress     = vmirtGetSymbolAddr(funcSymbol);
     Addr funcSize        = vmirtGetSymbolSize(funcSymbol);
 
@@ -326,13 +331,22 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
     /// read the memory that triggered the CB
     Uns32 checker = vmirtRead4ByteDomain(dataDomain, thisPC, endian, MEM_AA_FALSE);
 
-    /// checking for the correct symbols (0xe320f000 -> NOP operation or 0X4770bf00 ARMv7-M NOP or 0X477046c0 ARMv6-M NOP or 0Xd503201f AARCH64-a NOP )
-    if(checker!=0xe320f000 && checker!=0X4770bf00 && checker!=0X477046c0 && checker!=0Xd503201f)
+    /// checking for the correct symbols:
+    ///     0xe320f000 -> NOP operation or
+    ///     0X4770bf00 ARMv7-M NOP or
+    ///     0X477046c0 ARMv6-M NOP or
+    ///     0Xd503201f AARCH64-a NOP or
+    ///     0x85020001 RISC-V NOP
+    if( checker!=0xe320f000 && 
+        checker!=0X4770bf00 && 
+        checker!=0X477046c0 && 
+        checker!=0Xd503201f && 
+        checker!=0x85020001) {
         return;
+    }
 
     /// update the return code
     MACRO_UPDATE_STOP_REASON(service)
-
     /// enable the tools after the application begin
     switch (service) {
         /// After the application begins
@@ -533,7 +547,7 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                     fwrite(buffer,sizeof(char),funcSize,fileTrace);
                     fclose(fileTrace);
                 }
-                // Enable trace to a given variable
+                // Enable trace to a given variable in the gold execution
                 if(processorData->options.tracevariable){
                     vmiSymbolCP varSymbol;
                     // Verify processor type
@@ -544,19 +558,22 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                         // Cortex-M or baremetal
                         varSymbol = vmirtGetSymbolByName(processor, processorData->options.tracevariable);
                     }
-                    Addr varSize = vmirtGetSymbolSize(varSymbol);
-                    // Get final the reference result
-                    char* buffer = (char*) malloc (sizeof(char) * varSize);
-                    getSymbolValue(processor,processorData->options.tracevariable,buffer);
-                    // Gold file
-                    sprintf(tempString,FOLDER_DUMPS"/trace_gold_variable-%d",processorData->MACRO_PLATFORM_ID);
-                    fileTrace = fopen (tempString,"w+");
-                    // Write
-                    //fwrite(buffer,sizeof(char),funcSize,fileTrace);
-                    for (int i=0; i<varSize;i++){
-                        fprintf(fileTrace,"%02hhX ",buffer[i]);
+                    if (varSymbol != NULL) {
+                        Addr varSize = vmirtGetSymbolSize(varSymbol);
+                        // Get final the reference result
+                        char* buffer = (char*) malloc (sizeof(char) * varSize);
+                        getSymbolValue(processor,processorData->options.tracevariable,buffer);
+                        // Gold file
+                        sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_GOLD, 0);
+                        fileTrace = fopen (tempString,"w+");
+                        // Write
+                        for (int i=0; i<varSize;i++){
+                            fprintf(fileTrace,"%02hhX",buffer[i]);
+                        }
+                        fclose(fileTrace);
+                    } else {
+                        vmiMessage("W",PREFIX_FIM,"Variable <%s> not found\n", processorData->options.tracevariable);
                     }
-                    fclose(fileTrace);
                 }
 
             } else { // Fault Injection Platform
@@ -628,7 +645,7 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                     //~ fwrite(buffer,sizeof(char),funcSize,fileTrace);
                     //~ fclose(fileTrace);
                 }
-                // Enable trace to a given variable 
+                // Enable trace to a given variable in the faulty execution
                 if(processorData->options.tracevariable){
                     vmiSymbolCP varSymbol;
                     // Verify processor type
@@ -639,19 +656,22 @@ static VMIOS_INTERCEPT_FN(serviceHandler) {
                         // Cortex-M or baremetal
                         varSymbol = vmirtGetSymbolByName(processor, processorData->options.tracevariable);
                     }
-                    Addr varSize          = vmirtGetSymbolSize(varSymbol);
-                    // Get final the reference result
-                    char* buffer = (char*) malloc (sizeof(char) * varSize);
-                    getSymbolValue(processor,processorData->options.tracevariable,buffer);
-                    // Gold file
-                    sprintf(tempString,FOLDER_DUMPS"/trace_fault_variable-%d",processorData->MACRO_PLATFORM_ID);
-                    fileTrace = fopen (tempString,"w+");
-                    // Write
-                    //fwrite(buffer,sizeof(char),funcSize,fileTrace);
-                    for (int i=0; i<varSize;i++){
-                        fprintf(fileTrace,"%02hhX ",buffer[i]);
+                    if (varSymbol != NULL) {
+                        Addr varSize          = vmirtGetSymbolSize(varSymbol);
+                        // Get final the reference result
+                        char* buffer = (char*) malloc (sizeof(char) * varSize);
+                        getSymbolValue(processor,processorData->options.tracevariable,buffer);
+                        // Faulty file
+                        sprintf( tempString, "%s/%s-%d", FOLDER_TRACES, FILE_NAME_TRACE_FAULT, processorData->MACRO_PLATFORM_ID );
+                        fileTrace = fopen (tempString,"w+");
+                        // Write
+                        for (int i=0; i<varSize;i++){
+                            fprintf(fileTrace,"%02hhX",buffer[i]);
+                        }
+                        fclose(fileTrace);
+                    } else {
+                        vmiMessage("W",PREFIX_FIM,"Variable <%s> not found\n", processorData->options.tracevariable);
                     }
-                    fclose(fileTrace);
                 }
             }
         break; }
