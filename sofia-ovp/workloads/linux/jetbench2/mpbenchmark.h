@@ -39,7 +39,7 @@ const double dburner = 515.2;
 const double dturbin = 515.2;
 const double dnozl = 515.2;
 // arrays, store input and output data
-const double inputArray[48][48]= {
+const double inputArray[48][4]= {
             {0, 0, 90, 0.05},
 			{100, 0, 90, 0.05},
 			{200, 1000, 90, 0.05},

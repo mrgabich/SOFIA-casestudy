@@ -10,6 +10,7 @@ import copy
 import re
 from optparse   import OptionParser
 from random     import randint
+from random     import sample
 from array      import *
 import pylab as P
 import numpy as np
@@ -44,6 +45,7 @@ parser.add_option("--eqdist",    action="store_true", dest="eqdist",    help="Th
 # memory fault options
 parser.add_option("--memaddress",action="store", type="long", dest="memaddress", help="Default base memory address",default=0x0)
 parser.add_option("--memsize",   action="store", type="long", dest="memsize",    help="Default base memory size (in hex)",default=0x8000000)
+parser.add_option("--vectorbw",   action="store", type="long", dest="vecbw",    help="Default vector register size",default=128)
 
 # parse the options
 (options, args) = parser.parse_args()
@@ -146,6 +148,7 @@ fileptr.write("%8s %7s %10s %2s %18s %7s\n" %("Index","Type","Target","i","Inser
 
 #Counter of created faults per core
 possibleTargetCores = [0]*(numberOfCores)
+vecOffset = 0
 
 for i in range(1,options.numberoffaults+1):
     # fault injection time
@@ -177,13 +180,28 @@ for i in range(1,options.numberoffaults+1):
     #fault targer and mask by fault type
     # register fault
     if options.faulttype == faultTypesE.register.name or options.faulttype == faultTypesE.functiontrace.name:
+        archregisters = archRegisters()
         # choose the register
         faultRegisterIndex = randint(0,len(possibleRegisters)-1)
         numberOfFaultsPerReg[int(possibleRegisters[faultRegisterIndex][0])]+=1
 
-        if options.environment==archtecturesE.ovparmv8.name or options.environment==archtecturesE.gem5armv8.name:
+        if options.environment==archtecturesE.ovparmv8.name \
+            or options.environment==archtecturesE.gem5armv8.name\
+            or options.environment==archtecturesE.riscv64.name:
             if options.nobitflip:
                 faultMask = ctypes.c_uint64(0xFFFFFFFFFFFFFFFF)         #No effect
+            elif options.environment==archtecturesE.riscv64.name:
+                if possibleRegisters[faultRegisterIndex][1] in archregisters.vectorRegisters:
+                    bit_array = np.ones(options.vecbw, dtype=np.uint8)
+                    shiftValues = sample(range(0,(options.vecbw-1)), 1)
+                    for j in shiftValues:
+                        bit_array[j] ^= 1
+                    # Convert the bit array to bytes
+                    byte_array = np.packbits(bit_array)
+                    # Convert bytes to a hex string
+                    faultMask = byte_array.tobytes().hex()
+                else:
+                    faultMask = ctypes.c_uint64 (~(0x1<< randint(0,63)))    #Random mask of one bit between zero and 63 ones
             elif possibleRegisters[faultRegisterIndex][1]=="pc":
                 faultMask = ctypes.c_uint64 (~(0x10<< randint(0,57)))   #Random mask of one bit between 4 and 31 ones
             else:
@@ -191,6 +209,11 @@ for i in range(1,options.numberoffaults+1):
         else:
             if options.nobitflip:
                 faultMask = ctypes.c_uint32(0xFFFFFFFF)                 #No effect
+            elif options.environment==archtecturesE.riscv32.name:
+                if possibleRegisters[faultRegisterIndex][1] in archregisters.floatRegisters:
+                    faultMask = ctypes.c_uint64 (~(0x1<< randint(0,61)))    #Random mask of one bit between zero and 63 ones
+                else:
+                    faultMask = ctypes.c_uint32 (~(0x1<< randint(0,31)))    #Random mask of one bit between zero and 31 ones
             elif possibleRegisters[faultRegisterIndex][1]=="pc":
                 faultMask = ctypes.c_uint32 (~(0x10<< randint(0,23)))   #Random mask of one bit between 4 and 31 ones
             else:
@@ -257,7 +280,14 @@ for i in range(1,options.numberoffaults+1):
         else:
             faultMask = ctypes.c_uint8(~(0x1<< randint(0,7)))    # random mask of one bit between zero and 31 ones
 
-
-
-    fileptr.write("%7d %10s %16s %4s %15d:%d %12X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
+    if options.environment==archtecturesE.ovparmv8.name \
+        or options.environment==archtecturesE.gem5armv8.name \
+        or options.environment==archtecturesE.riscv64.name:
+        if possibleRegisters[faultRegisterIndex][1] in archregisters.vectorRegisters \
+            or (options.environment==archtecturesE.ovparmv8.name and possibleRegisters[faultRegisterIndex][1] in archregisters.simdfloatRegisters):
+                fileptr.write("%7d %10s %16s %4s %15d:%d %130s\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.upper()))
+        else:
+            fileptr.write("%7d %10s %16s %4s %15d:%d %130X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
+    else:
+        fileptr.write("%7d %10s %16s %4s %15d:%d %12X\n" % (i,faulttype,target,index,faultTime,faultCore,faultMask.value))
 fileptr.close()

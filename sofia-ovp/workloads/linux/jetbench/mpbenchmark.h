@@ -39,7 +39,7 @@ const double dburner = 515.2;
 const double dturbin = 515.2;
 const double dnozl = 515.2;
 // arrays, store input and output data
-const double inputArray[1][1]= {
+const double inputArray[48][4]= {
             {0, 0, 90, 0.05},
 			{100, 0, 90, 0.05},
 			{200, 1000, 90, 0.05},
@@ -89,7 +89,7 @@ const double inputArray[1][1]= {
 			{165, 1000, 50, 0.05},
 			{150, 0, 50, 0.05}
 			};
-double outputArray[48][48]={0};
+double outputArray[48][18]={0};
 
 int LineCount = 48;
 int NumPoints = 0, NumMissed = 0;

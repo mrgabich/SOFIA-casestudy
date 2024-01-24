@@ -25,5 +25,3 @@ faultgenerator = faultGenerator(options=options)
 
 # create fault list
 faultlist = faultgenerator.createfaultlist()
-
-

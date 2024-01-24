@@ -78,14 +78,14 @@ def nnList(faultListNN):
         or fault[6]==errorAnalysis.silent_data_corruption.name:
             if fault[12]==errorAnalysisNNShort.CORRECT.name \
             or fault[12]==errorAnalysisNNShort.INPROB1.name:
-                fault[6]=errorAnalysisML.Incorrect_Probability_Soft.name
-                fault[7]=errorAnalysisML.Incorrect_Probability_Soft.value
+                fault[6]=errorAnalysisML.Tolerable.name
+                fault[7]=errorAnalysisML.Tolerable.value
             elif fault[12]==errorAnalysisNNShort.INPROB2.name:
                 fault[6]=errorAnalysisML.Incorrect_Probability_Hard.name
                 fault[7]=errorAnalysisML.Incorrect_Probability_Hard.value
             elif fault[12]==errorAnalysisNNShort.WRONG.name:
-                fault[6]=errorAnalysisML.Wrong_Probability.name
-                fault[7]=errorAnalysisML.Wrong_Probability.value
+                fault[6]=errorAnalysisML.Critical.name
+                fault[7]=errorAnalysisML.Critical.value
             else:
                 fault[6]=errorAnalysisML.No_Prediction.name
                 fault[7]=errorAnalysisML.No_Prediction.value

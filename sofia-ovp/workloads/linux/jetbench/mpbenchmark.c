@@ -504,14 +504,15 @@ int main(int argc,char *argv[])
 /*void printResult(){
 	// header for results
 	
-	printf("Spd| Alt |  Thr| Mach|Press| Temp| Fnet|Fgros|RamDr|FlFlo|TSFC|Airfl|Weight|Fn/W\n");
+	printf("T,ExecTime,  Spd| Alt |  Thr| Mach|Press| Temp| Fnet|Fgros|RamDr|FlFlo|TSFC|Airfl|Weight|Fn/W\n");
 	int i=0;
 	for (i = 0; i < LineCount; i++) {
-		printf("%4.0f|%5.0f|%5.1f|%5.3f|%5.2f|%5.1f|%5.0f|%5.0f|%5.0f|%5.0f|%4.2f|%5.1f|%6.2f|%4.2f\n",
-								outputArray[i][2], outputArray[i][3],
+		printf("%d,%7f, %4.0f|%5.0f|%5.1f|%5.3f|%5.2f|%5.1f|%5.0f|%5.0f|%5.0f|%5.0f|%4.2f|%5.1f|%6.2f|%4.2f|%3.1f|%d\n",
+								(int) outputArray[i][0], outputArray[i][1], outputArray[i][2], outputArray[i][3],
 								outputArray[i][4], outputArray[i][5], outputArray[i][6], outputArray[i][7],
 								outputArray[i][8], outputArray[i][9], outputArray[i][10], outputArray[i][11],
-								outputArray[i][12], outputArray[i][13], outputArray[i][14], outputArray[i][15]);
+								outputArray[i][12], outputArray[i][13], outputArray[i][14], outputArray[i][15],
+								outputArray[i][16], (int) outputArray[i][17]);
 	}
 	
 	printf("%d\n", NumMissed);
