@@ -77,12 +77,9 @@ def nnList(faultListNN):
         or fault[6]==errorAnalysis.REG_STATE_Data_ERROR.name \
         or fault[6]==errorAnalysis.silent_data_corruption.name:
             if fault[12]==errorAnalysisNNShort.CORRECT.name \
-            or fault[12]==errorAnalysisNNShort.INPROB1.name:
+            or fault[12]==errorAnalysisNNShort.CORRECT.name:
                 fault[6]=errorAnalysisML.Tolerable.name
                 fault[7]=errorAnalysisML.Tolerable.value
-            elif fault[12]==errorAnalysisNNShort.INPROB2.name:
-                fault[6]=errorAnalysisML.Incorrect_Probability_Hard.name
-                fault[7]=errorAnalysisML.Incorrect_Probability_Hard.value
             elif fault[12]==errorAnalysisNNShort.WRONG.name:
                 fault[6]=errorAnalysisML.Critical.name
                 fault[7]=errorAnalysisML.Critical.value
@@ -648,7 +645,7 @@ if options.groupsnn:
 
     dataTemp = Counter([ item[7] for item in faultListNN]).items()
     data = sorted(dataTemp)
-    temp_list = [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0)]
+    temp_list = [(0,0), (1,0), (2,0), (3,0)]
     lst = []
     for tup1 in temp_list:
         sum_ = 0

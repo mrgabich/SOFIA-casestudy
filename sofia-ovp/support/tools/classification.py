@@ -102,19 +102,14 @@ class errorAnalysisDACShort(Enum):
 
 class errorAnalysisNNShort(Enum):
     CORRECT,\
-    INPROB1,\
-    INPROB2,\
     WRONG,\
-    NOPRED,\
-    ERROR = list(range(6))
+    ERROR = list(range(3))
 
 class errorAnalysisML(Enum):
     Correct,\
     Tolerable,\
     Critical,\
-    Wrong_Probability,\
-    No_Prediction,\
-    UT_Hang = list(range(6))
+    UT_Hang = list(range(4))
 
 class simulationStatesE (Enum):
     FIM_GOLD_EXECUTION,\

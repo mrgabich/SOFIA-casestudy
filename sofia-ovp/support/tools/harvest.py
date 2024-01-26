@@ -127,8 +127,7 @@ if options.outputdata:
     gold_appdata=[]
     fault_appdata=[]
     output_start = 0
-    import struct
-    import time
+    
     #Find the Address in the Gold Trace Dump
     found=0
     goldPatternIndex=0
