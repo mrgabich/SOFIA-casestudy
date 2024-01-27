@@ -178,8 +178,6 @@ if options.outputdata:
             #x=0
             #for z in goldresultlist:
                 #print("{}\t\t{}".format(goldresultlist[x], faultresultlist[x]))
-                #x+=1
-#print("------------------", faultList,"---------------------------")
 # -------------------------------------- Generate the Output File ----------------------------------- #
 fileptr = open(options.application+"."+options.environment+".reportfile", 'w')
 
