@@ -4,7 +4,7 @@
 
 int main();
 void InitializeArray();
-void printResult();
+//void printResult();
 double deg2rad(double deg,double pi);
 double sqroot(double numb1er);
 double fabs(double x);

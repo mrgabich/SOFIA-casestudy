@@ -494,16 +494,16 @@ int main(int argc,char *argv[])
 
 	}//end of parallel
 	BenchmarEndTime = omp_get_wtime();
-	printResult();
+	//printResult();
 
 	//FIM
     FIM_exit();
 	return 0;
 }
 
-void printResult(){
+/*void printResult(){
 	// header for results
-	/*
+	
 	printf("T,ExecTime,  Spd| Alt |  Thr| Mach|Press| Temp| Fnet|Fgros|RamDr|FlFlo|TSFC|Airfl|Weight|Fn/W\n");
 	int i=0;
 	for (i = 0; i < LineCount; i++) {
@@ -513,7 +513,7 @@ void printResult(){
 								outputArray[i][8], outputArray[i][9], outputArray[i][10], outputArray[i][11],
 								outputArray[i][12], outputArray[i][13], outputArray[i][14], outputArray[i][15],
 								outputArray[i][16], (int) outputArray[i][17]);
-	}*/
+	}
 	
 	printf("%d\n", NumMissed);
 	printf("Thread response time sum:%f\n", TotalTime);
@@ -522,7 +522,7 @@ void printResult(){
 	double benchmarkTotalTime = (BenchmarEndTime - BenchmarkStartTime);
 	printf("%f\n", benchmarkTotalTime);
 
-}
+}*\
 
 
 /* Utility to convert degree in radian */
