@@ -289,11 +289,11 @@ def run():
         if len(ppservers) == 0 and running == args.localWorkers:
             running=0
             # Define sleep for set of threads and avoid load interference
-            chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
-            if (int(subprocess.check_output(chkload, shell=True)) >= 10):
-                time.sleep(120)
-            else:
-                time.sleep(random.uniform(2, 8))
+            #chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
+            #if (int(subprocess.check_output(chkload, shell=True)) >= 10):
+               # time.sleep(120)
+            #else:
+            time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 
@@ -327,11 +327,11 @@ def runErrors(pids):
         if len(ppservers) == 0 and running == args.localWorkers:
             running=0
             # Define sleep for set of threads and avoid load interference
-            chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
-            if (int(subprocess.check_output(chkload, shell=True)) >= 10):
-                time.sleep(120)
-            else:
-                time.sleep(random.uniform(2, 8))
+            #chkload = "uptime | awk '{n=split($0, array, \" \")} END {print $(n-2)}' | cut -d \".\" -f 1"
+            #if (int(subprocess.check_output(chkload, shell=True)) >= 10):
+                #time.sleep(120)
+            #else:
+            time.sleep(random.uniform(2, 8))
     for job in jobs:
         res = job()
 
